@@ -1,6 +1,7 @@
 package com.journme.rest.config;
 
 import com.journme.rest.RootResource;
+import com.journme.rest.common.filter.AuthTokenFilter;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.JournMeExceptionDto.ExcpetionCode;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -32,7 +33,7 @@ public class JerseyConfig extends ResourceConfig {
         register(RootResource.class);
 
         //Jersey filters
-
+        register(AuthTokenFilter.class);
 
         //Jersey features
         register(JacksonFeature.class);
