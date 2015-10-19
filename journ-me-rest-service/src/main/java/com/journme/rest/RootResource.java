@@ -1,9 +1,10 @@
 package com.journme.rest;
 
-import com.journme.rest.journey.resource.JourneyProtectedResource;
-import com.journme.rest.journey.resource.JourneyPublicResource;
+import com.journme.rest.journey.resource.JourneyResource;
+import com.journme.rest.journey.service.JourneyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
@@ -26,6 +27,9 @@ public class RootResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RootResource.class);
 
+    @Autowired
+    JourneyService journeyService;
+
     @GET
     @Path("/internal/monitoring/healthchecks")
     public String getHealthcheck() {
@@ -33,14 +37,9 @@ public class RootResource {
         return "{'status':'OK','message':'OK!'}";
     }
 
-    //TODO: Why can't two subresources have the same path?
-    @Path("/journey0")
-    public Class<JourneyPublicResource> getJourneyPublicResource() {
-        return JourneyPublicResource.class;
+    @Path("/journey")
+    public Class<JourneyResource> getJourneyPublicResource() {
+        return JourneyResource.class;
     }
 
-    @Path("/journey1")
-    public Class<JourneyProtectedResource> getJourneyProtectedResource() {
-        return JourneyProtectedResource.class;
-    }
 }
