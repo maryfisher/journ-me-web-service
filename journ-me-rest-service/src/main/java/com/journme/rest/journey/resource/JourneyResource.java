@@ -1,8 +1,10 @@
 package com.journme.rest.journey.resource;
 
-import com.journme.domain.Journey;
+import com.journme.domain.JourneyBase;
+import com.journme.domain.JourneyDetails;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
-import com.journme.rest.journey.repository.JourneyRepository;
+import com.journme.rest.journey.repository.JourneyBaseRepository;
+import com.journme.rest.journey.repository.JourneyDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,35 +26,37 @@ import javax.ws.rs.*;
 public class JourneyResource {
 
     @Autowired
-    JourneyRepository journeyRepository;
+    JourneyDetailsRepository journeyDetailsRepository;
+
+    @Autowired
+    JourneyBaseRepository journeyBaseRepository;
 
     @GET
     @Path("/{journeyId}")
-    public Journey retrieveJourney(@PathParam("journeyId") String journeyId) {
-        return journeyRepository.findOne(journeyId);
+    public JourneyDetails retrieveJourney(@PathParam("journeyId") String journeyId) {
+        JourneyDetails journey = journeyDetailsRepository.findOne(journeyId);
+        return journey;
     }
 
     @POST
     @ProtectedByAuthToken
-    public String createJourney(Journey newJourney) {
+    public JourneyBase createJourney(JourneyBase newJourney) {
         newJourney.setId(null); //ensures that new Journey is created in the collection
-        Journey savedJourney = journeyRepository.save(newJourney);
-        return savedJourney.getId();
+        return journeyBaseRepository.save(newJourney);
     }
 
     @POST
     @Path("/{journeyId}")
     @ProtectedByAuthToken
-    public boolean updateJourney(
+    public JourneyBase updateJourney(
             @PathParam("journeyId") String journeyId,
-            Journey changedJourney) {
-        Journey existingJourney = journeyRepository.findOne(journeyId);
+            JourneyBase changedJourney) {
+        JourneyBase existingJourney = journeyBaseRepository.findOne(journeyId);
         if (existingJourney != null) {
-            changedJourney.setId(existingJourney.getId());
-            journeyRepository.save(changedJourney);
-            return true;
+            existingJourney.copy(changedJourney);
+            return journeyBaseRepository.save(existingJourney);
         } else {
-            return false;
+            return null;
         }
     }
 

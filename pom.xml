@@ -110,6 +110,8 @@
                 <artifactId>jersey-client</artifactId>
                 <version>${jersey.version}</version>
             </dependency>-->
+
+            <!-- Utility libraries -->
         </dependencies>
     </dependencyManagement>
 
