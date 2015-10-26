@@ -1,16 +1,24 @@
 package com.journme.rest.journey.resource;
 
+import com.journme.domain.Alias;
 import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
+import com.journme.rest.alias.repository.AliasRepository;
+import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
+import com.journme.rest.contract.journey.CreateJourneyRequest;
 import com.journme.rest.journey.repository.JourneyBaseRepository;
 import com.journme.rest.journey.repository.JourneyDetailsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 /**
  * <h1>Journey endpoints</h1>
@@ -25,24 +33,40 @@ import javax.ws.rs.*;
 @Produces(MediaType.APPLICATION_JSON_VALUE)
 public class JourneyResource {
 
-    @Autowired
-    JourneyDetailsRepository journeyDetailsRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JourneyResource.class);
 
     @Autowired
-    JourneyBaseRepository journeyBaseRepository;
+    private JourneyDetailsRepository journeyDetailsRepository;
+
+    @Autowired
+    private JourneyBaseRepository journeyBaseRepository;
+
+    @Autowired
+    private AliasRepository aliasRepository;
 
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@PathParam("journeyId") String journeyId) {
-        JourneyDetails journey = journeyDetailsRepository.findOne(journeyId);
-        return journey;
+        LOGGER.info("Incoming request to retrieve journey {}", journeyId);
+        return journeyDetailsRepository.findOne(journeyId);
     }
 
     @POST
     @ProtectedByAuthToken
-    public JourneyBase createJourney(JourneyBase newJourney) {
-        newJourney.setId(null); //ensures that new Journey is created in the collection
-        return journeyBaseRepository.save(newJourney);
+    public JourneyBase createJourney(CreateJourneyRequest createRequest) {
+        JourneyBase journey = createRequest.getJourney();
+        LOGGER.info("Incoming request to create a journey with name {}", journey.getName());
+
+        Alias alias = aliasRepository.findOne(createRequest.getAliasId());
+        if (alias != null) {
+            journey.setAlias(alias);
+            journey.setId(null); //ensures that new Journey is created in the collection
+            return journeyBaseRepository.save(journey);
+        } else {
+            throw new JournMeException("No alias found for given alias ID",
+                    Response.Status.BAD_REQUEST,
+                    ExceptionCode.ALIAS_NONEXISTENT);
+        }
     }
 
     @POST
@@ -51,6 +75,7 @@ public class JourneyResource {
     public JourneyBase updateJourney(
             @PathParam("journeyId") String journeyId,
             JourneyBase changedJourney) {
+        LOGGER.info("Incoming request to update journey {}", journeyId);
         JourneyBase existingJourney = journeyBaseRepository.findOne(journeyId);
         if (existingJourney != null) {
             existingJourney.copy(changedJourney);

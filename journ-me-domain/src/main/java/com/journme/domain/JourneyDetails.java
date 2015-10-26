@@ -2,6 +2,7 @@ package com.journme.domain;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,22 +16,22 @@ import java.util.List;
 public class JourneyDetails extends JourneyBase {
 
     @DBRef(lazy = true)
-    private List<Moment> moments;
+    private List<Moment> moments = new ArrayList<Moment>();
 
     @DBRef(lazy = true)
-    private List<Alias> followers;
+    private List<Alias> followers = new ArrayList<Alias>();
 
     @DBRef(lazy = true)
-    private List<JourneyBase> linkedToJourneys;
+    private List<JourneyBase> linkedToJourneys = new ArrayList<JourneyBase>();
 
     @DBRef(lazy = true)
-    private List<JourneyBase> linkedFromJourneys;
+    private List<JourneyBase> linkedFromJourneys = new ArrayList<JourneyBase>();
 
     @DBRef(lazy = true)
-    private List<Alias> joinedAliases;
+    private List<Alias> joinedAliases = new ArrayList<Alias>();
 
     @DBRef(lazy = true)
-    private List<Alias> joinRequests;
+    private List<Alias> joinRequests = new ArrayList<Alias>();
 
     public List<Moment> getMoments() {
         return moments;

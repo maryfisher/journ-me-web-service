@@ -1,13 +1,15 @@
 package com.journme.domain;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * <h1>Domain class/persistence entity</h1>
- * The class representing a user in the persistent store.
+ * The class representing a user in the persistent store
  *
  * @author mary_fisher
  * @version 1.0
@@ -16,19 +18,16 @@ import java.util.List;
 @Document(collection = "user")
 public class User extends BaseEntity {
 
+    @Indexed(unique = true)
     private String email;
 
     @DBRef(lazy = true)
-    private List<Alias> aliases;
+    private List<Alias> aliases = new ArrayList<Alias>();
 
     @DBRef(lazy = true)
     private Alias currentAlias;
 
-    private String salt;
-
     private String password;
-
-    private String authToken;
 
     public String getEmail() {
         return email;
@@ -54,27 +53,11 @@ public class User extends BaseEntity {
         this.currentAlias = currentAlias;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getAuthToken() {
-        return authToken;
-    }
-
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
     }
 }

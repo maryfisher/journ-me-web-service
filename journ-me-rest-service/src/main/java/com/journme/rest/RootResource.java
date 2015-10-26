@@ -1,15 +1,17 @@
 package com.journme.rest;
 
 import com.journme.rest.journey.resource.JourneyResource;
-import com.journme.rest.journey.service.JourneyService;
+import com.journme.rest.user.resource.UserResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 /**
  * <h1>Jersey root resource</h1>
@@ -23,23 +25,27 @@ import javax.ws.rs.Path;
 @Component
 @Singleton
 @Path("/api")
+@Consumes(MediaType.APPLICATION_JSON_VALUE)
+@Produces(MediaType.APPLICATION_JSON_VALUE)
 public class RootResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RootResource.class);
 
-    @Autowired
-    JourneyService journeyService;
-
     @GET
     @Path("/internal/monitoring/healthchecks")
     public String getHealthcheck() {
-        LOGGER.debug("Internal healthcheck call");
+        LOGGER.debug("Incoming healthcheck call");
         return "{'status':'OK','message':'OK!'}";
     }
 
     @Path("/journey")
-    public Class<JourneyResource> getJourneyPublicResource() {
+    public Class<JourneyResource> getJourneyResource() {
         return JourneyResource.class;
+    }
+
+    @Path("/user")
+    public Class<UserResource> getUserResource() {
+        return UserResource.class;
     }
 
 }

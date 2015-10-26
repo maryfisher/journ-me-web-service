@@ -15,7 +15,7 @@ public class JournMeExceptionDto {
     private final String code;
     private Map<String, Object> interpolationMap;
 
-    public JournMeExceptionDto(ExcpetionCode code) {
+    public JournMeExceptionDto(ExceptionCode code) {
         this.code = code.toString();
     }
 
@@ -31,7 +31,7 @@ public class JournMeExceptionDto {
         this.interpolationMap = interpolationMap;
     }
 
-    public enum ExcpetionCode {
+    public enum ExceptionCode {
         CLIENT_SERVER_PROBLEM("110"),
         INTERNAL_SYSTEM_PROBLEM("120"),
         UPSTREAM_SYSTEM_PROBLEM("130"),
@@ -39,11 +39,13 @@ public class JournMeExceptionDto {
         AUTH_TOKEN_INVALID("220"),
         FILE_TYPE_CORRUPTED_INVALID("310"),
         FILE_TOO_BIG("311"),
-        FILE_EMPTY("312");
+        FILE_EMPTY("312"),
+        ALIAS_NONEXISTENT("320"),
+        EMAIL_TAKEN("321");
 
         private final String code;
 
-        ExcpetionCode(String code) {
+        ExceptionCode(String code) {
             this.code = code;
         }
 

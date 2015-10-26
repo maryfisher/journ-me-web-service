@@ -1,7 +1,7 @@
 package com.journme.rest.common.filter;
 
 import com.journme.rest.contract.JournMeExceptionDto;
-import com.journme.rest.contract.JournMeExceptionDto.ExcpetionCode;
+import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +33,9 @@ public class AuthTokenFilter implements ContainerRequestFilter {
         String token = requestContext.getHeaders().getFirst("authToken");
 
         if (!"Teddy".equals(token)) {
+            LOGGER.info("Incoming request failed authToken security check");
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).
-                    entity(new JournMeExceptionDto(ExcpetionCode.AUTH_TOKEN_INVALID)).
+                    entity(new JournMeExceptionDto(ExceptionCode.AUTH_TOKEN_INVALID)).
                     type("application/json").
                     build());
         }
