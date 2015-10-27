@@ -9,6 +9,8 @@ import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
 import com.journme.rest.contract.user.RegisterRequest;
 import com.journme.rest.user.repository.UserRepository;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class UserResource {
 
     @POST
     @Path("/authentication/login")
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(@NotNull @Valid LoginRequest loginRequest) {
         LOGGER.info("Incoming request to login user with email {}", loginRequest.getEmail());
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
@@ -66,7 +68,7 @@ public class UserResource {
 
     @POST
     @Path("/authentication/register")
-    public LoginResponse register(RegisterRequest registerRequest) {
+    public LoginResponse register(@NotNull @Valid RegisterRequest registerRequest) {
         LOGGER.info("Incoming request to register user with email {}", registerRequest.getEmail());
 
         //TODO: move validation to Java Bean Validation framework
@@ -89,7 +91,7 @@ public class UserResource {
         userRepository.save(newUser);
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, "Teddy");
+        loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, registerRequest.getEmail());
         return loginResponse;
     }
 

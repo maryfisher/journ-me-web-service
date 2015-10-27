@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,6 +21,7 @@ public abstract class BaseEntity {
     private String id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @CreatedDate

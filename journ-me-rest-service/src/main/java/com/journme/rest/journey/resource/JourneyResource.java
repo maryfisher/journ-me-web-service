@@ -10,15 +10,22 @@ import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.rest.contract.journey.CreateJourneyRequest;
 import com.journme.rest.journey.repository.JourneyBaseRepository;
 import com.journme.rest.journey.repository.JourneyDetailsRepository;
+import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-
-import javax.inject.Singleton;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
 
 /**
  * <h1>Journey endpoints</h1>
@@ -46,14 +53,14 @@ public class JourneyResource {
 
     @GET
     @Path("/{journeyId}")
-    public JourneyDetails retrieveJourney(@PathParam("journeyId") String journeyId) {
+    public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
         LOGGER.info("Incoming request to retrieve journey {}", journeyId);
         return journeyDetailsRepository.findOne(journeyId);
     }
 
     @POST
     @ProtectedByAuthToken
-    public JourneyBase createJourney(CreateJourneyRequest createRequest) {
+    public JourneyBase createJourney(@NotNull @Valid CreateJourneyRequest createRequest) {
         JourneyBase journey = createRequest.getJourney();
         LOGGER.info("Incoming request to create a journey with name {}", journey.getName());
 
@@ -73,8 +80,8 @@ public class JourneyResource {
     @Path("/{journeyId}")
     @ProtectedByAuthToken
     public JourneyBase updateJourney(
-            @PathParam("journeyId") String journeyId,
-            JourneyBase changedJourney) {
+            @NotBlank @PathParam("journeyId") String journeyId,
+            @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
         JourneyBase existingJourney = journeyBaseRepository.findOne(journeyId);
         if (existingJourney != null) {
