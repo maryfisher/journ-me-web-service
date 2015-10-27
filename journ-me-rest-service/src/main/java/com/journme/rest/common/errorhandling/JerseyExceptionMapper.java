@@ -32,11 +32,6 @@ public class JerseyExceptionMapper implements ExceptionMapper<Throwable> {
             rb = Response.
                     status(jmEx.getHttpStatus()).
                     entity(new JournMeExceptionDto(jmEx.getCode()));
-        } else if (ex instanceof IllegalArgumentException) {
-            LOGGER.info("Handled illegal argument: ", ex);
-            rb = Response.
-                    status(Response.Status.BAD_REQUEST).
-                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.FILE_TYPE_CORRUPTED_INVALID));
         } else if (ex instanceof ClientErrorException) {
             LOGGER.info("Handled client call issue: ", ex);
             rb = Response.

@@ -32,16 +32,22 @@ public class JournMeExceptionDto {
     }
 
     public enum ExceptionCode {
+        //Technical issues 1xx
         CLIENT_SERVER_PROBLEM("110"),
         INTERNAL_SYSTEM_PROBLEM("120"),
         UPSTREAM_SYSTEM_PROBLEM("130"),
+
+        //Security issues 2xx
         AUTHENTICATION_FAILED("210"),
         AUTH_TOKEN_INVALID("220"),
-        FILE_TYPE_CORRUPTED_INVALID("310"),
-        FILE_TOO_BIG("311"),
-        FILE_EMPTY("312"),
-        ALIAS_NONEXISTENT("320"),
-        EMAIL_TAKEN("321");
+
+        //Incoming value issues 3xx
+        ALIAS_NONEXISTENT("310"),
+        JOURNEY_NONEXISTENT("311"),
+        EMAIL_TAKEN("320"),
+        FILE_TYPE_CORRUPTED_INVALID("330"),
+        FILE_TOO_BIG("331"),
+        FILE_EMPTY("332");
 
         private final String code;
 

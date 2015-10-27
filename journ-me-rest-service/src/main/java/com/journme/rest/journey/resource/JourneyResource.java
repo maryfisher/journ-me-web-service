@@ -63,7 +63,7 @@ public class JourneyResource {
             journey.setId(null); //ensures that new Journey is created in the collection
             return journeyBaseRepository.save(journey);
         } else {
-            throw new JournMeException("No alias found for given alias ID",
+            throw new JournMeException("No alias found for given alias ID " + createRequest.getAliasId(),
                     Response.Status.BAD_REQUEST,
                     ExceptionCode.ALIAS_NONEXISTENT);
         }
@@ -81,7 +81,9 @@ public class JourneyResource {
             existingJourney.copy(changedJourney);
             return journeyBaseRepository.save(existingJourney);
         } else {
-            return null;
+            throw new JournMeException("No journey found for given journey ID " + journeyId,
+                    Response.Status.BAD_REQUEST,
+                    ExceptionCode.JOURNEY_NONEXISTENT);
         }
     }
 
