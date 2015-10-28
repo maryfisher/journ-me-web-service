@@ -16,8 +16,8 @@ import java.lang.annotation.RetentionPolicy;
 public @interface ProtectedByAuthToken {
 
     /**
-     * String identifier for Authorization Token authentication. Value "AUTHORIZATION_TOKEN"
+     * String identifier for Authorization Token authentication. Value "JM_TOKEN_AUTH"
      */
-    String AUTHORIZATION_TOKEN = "AUTHORIZATION_TOKEN";
+    String TOKEN_AUTH = "JM_TOKEN_AUTH";
 
 }

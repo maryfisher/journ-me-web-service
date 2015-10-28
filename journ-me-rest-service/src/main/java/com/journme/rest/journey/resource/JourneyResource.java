@@ -5,6 +5,7 @@ import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.repository.AliasRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.common.filter.AuthTokenFilter;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.rest.contract.journey.CreateJourneyRequest;
@@ -19,7 +20,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +54,10 @@ public class JourneyResource {
     @Autowired
     private AliasRepository aliasRepository;
 
+    //Runtime will inject request-scoped proxy into singleton resource class field
+    @Context
+    private SecurityContext securityContext;
+
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
@@ -64,13 +71,13 @@ public class JourneyResource {
         JourneyBase journey = createRequest.getJourney();
         LOGGER.info("Incoming request to create a journey with name {}", journey.getName());
 
-        Alias alias = aliasRepository.findOne(createRequest.getAliasId());
+        Alias alias = AuthTokenFilter.returnAliasFromContext(securityContext, createRequest.getAliasId());
         if (alias != null) {
             journey.setAlias(alias);
             journey.setId(null); //ensures that new Journey is created in the collection
             return journeyBaseRepository.save(journey);
         } else {
-            throw new JournMeException("No alias found for given alias ID " + createRequest.getAliasId(),
+            throw new JournMeException("User does not own given alias " + createRequest.getAliasId(),
                     Response.Status.BAD_REQUEST,
                     ExceptionCode.ALIAS_NONEXISTENT);
         }
@@ -83,12 +90,22 @@ public class JourneyResource {
             @NotBlank @PathParam("journeyId") String journeyId,
             @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
+
         JourneyBase existingJourney = journeyBaseRepository.findOne(journeyId);
         if (existingJourney != null) {
-            existingJourney.copy(changedJourney);
-            return journeyBaseRepository.save(existingJourney);
+            Alias journeyAlias = existingJourney.getAlias();
+            Alias userAlias = AuthTokenFilter.returnAliasFromContext(securityContext, journeyAlias.getId());
+
+            if (userAlias != null) {
+                existingJourney.copy(changedJourney);
+                return journeyBaseRepository.save(existingJourney);
+            } else {
+                throw new JournMeException("User does not own given journey " + journeyId,
+                        Response.Status.BAD_REQUEST,
+                        ExceptionCode.JOURNEY_NONEXISTENT);
+            }
         } else {
-            throw new JournMeException("No journey found for given journey ID " + journeyId,
+            throw new JournMeException("No journey exists for given journey " + journeyId,
                     Response.Status.BAD_REQUEST,
                     ExceptionCode.JOURNEY_NONEXISTENT);
         }
