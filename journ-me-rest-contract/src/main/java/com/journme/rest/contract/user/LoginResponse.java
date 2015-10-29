@@ -28,4 +28,8 @@ public class LoginResponse {
     public void setHeaderItems(Map<String, Object> headerItems) {
         this.headerItems = headerItems;
     }
+
+    public void put(String key, Object value) {
+        this.headerItems.put(key, value);
+    }
 }

@@ -4,6 +4,7 @@ import com.journme.domain.Alias;
 import com.journme.domain.User;
 import com.journme.rest.alias.repository.AliasRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
@@ -45,6 +46,9 @@ public class UserResource {
     @Autowired
     private AliasRepository aliasRepository;
 
+    @Autowired
+    private AuthTokenService authTokenService;
+
     @POST
     @Path("/authentication/login")
     public LoginResponse login(@NotNull @Valid LoginRequest loginRequest) {
@@ -55,13 +59,14 @@ public class UserResource {
             throw new JournMeException("No user exists with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
-        } else if (!user.getPassword().equals(loginRequest.getPassword())) {
+        //TODO: use a hashing algorithm
+        } else if (!user.getPasswordHash().equals(loginRequest.getPassword())) {
             throw new JournMeException("Wrong password for user with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
         } else {
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, loginRequest.getEmail());
+            loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
             return loginResponse;
         }
     }
@@ -71,7 +76,6 @@ public class UserResource {
     public LoginResponse register(@NotNull @Valid RegisterRequest registerRequest) {
         LOGGER.info("Incoming request to register user with email {}", registerRequest.getEmail());
 
-        //TODO: move validation to Java Bean Validation framework
         User existingUser = userRepository.findByEmail(registerRequest.getEmail());
         if (existingUser != null) {
             throw new JournMeException("User already exists with email " + registerRequest.getEmail(),
@@ -85,13 +89,13 @@ public class UserResource {
 
         User newUser = new User();
         newUser.setEmail(registerRequest.getEmail());
-        newUser.setPassword(registerRequest.getPassword());
+        newUser.setPasswordHash(registerRequest.getPassword());
         newUser.setCurrentAlias(newUserFirstAlias);
         newUser.getAliases().add(newUserFirstAlias);
         userRepository.save(newUser);
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, registerRequest.getEmail());
+        loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));
         return loginResponse;
     }
 

@@ -1,17 +1,23 @@
 package com.journme.rest.common.errorhandling;
 
-import com.journme.rest.contract.JournMeExceptionDto;
+import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 
 import javax.ws.rs.core.Response;
 
 public class JournMeException extends IllegalArgumentException {
 
-    private final JournMeExceptionDto.ExceptionCode code;
+    private final ExceptionCode code;
 
     private final Response.Status httpStatus;
 
-    public JournMeException(String message, Response.Status httpStatus, JournMeExceptionDto.ExceptionCode code) {
+    public JournMeException(String message, Response.Status httpStatus, ExceptionCode code) {
         super(message);
+        this.httpStatus = httpStatus;
+        this.code = code;
+    }
+
+    public JournMeException(String message, Response.Status httpStatus, ExceptionCode code, Throwable throwable) {
+        super(message, throwable);
         this.httpStatus = httpStatus;
         this.code = code;
     }
@@ -20,7 +26,7 @@ public class JournMeException extends IllegalArgumentException {
         return httpStatus;
     }
 
-    public JournMeExceptionDto.ExceptionCode getCode() {
+    public ExceptionCode getCode() {
         return code;
     }
 }

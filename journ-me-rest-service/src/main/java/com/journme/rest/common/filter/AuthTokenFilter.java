@@ -2,6 +2,7 @@ package com.journme.rest.common.filter;
 
 import com.journme.domain.Alias;
 import com.journme.domain.User;
+import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.rest.user.repository.UserRepository;
@@ -18,6 +19,7 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 /**
  * <h1>Authentication filter</h1>
@@ -35,18 +37,16 @@ public class AuthTokenFilter implements ContainerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthTokenFilter.class);
 
     @Autowired
-    private UserRepository userRepository;
+    private AuthTokenService authTokenService;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String token = requestContext.getHeaders().getFirst("authToken");
+        String authToken = requestContext.getHeaders().getFirst("authToken");
 
-        //TODO: implement real authentication
-        User user = userRepository.findByEmail(token);
+        User user = authTokenService.unwrapAuthToken(authToken);
         if (user != null) {
             requestContext.setSecurityContext(new JMSecurityContext(requestContext.getSecurityContext(), user));
         } else {
-            LOGGER.info("Incoming request failed authToken security check");
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).
                     entity(new JournMeExceptionDto(ExceptionCode.AUTH_TOKEN_INVALID)).
                     type("application/json").
