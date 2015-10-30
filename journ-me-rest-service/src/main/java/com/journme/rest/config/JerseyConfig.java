@@ -11,11 +11,10 @@ import com.journme.rest.RootResource;
 import com.journme.rest.common.errorhandling.JerseyExceptionMapper;
 import com.journme.rest.common.filter.AuthTokenFilter;
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.util.List;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-
-import com.mongodb.DBRef;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -60,22 +59,21 @@ public class JerseyConfig extends ResourceConfig {
             defaultObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
             final SimpleModule module = new SimpleModule("MongoDBRefSerializer");
+            module.addSerializer(Proxy.class, new JsonSerializer<Proxy>() {
+                @Override
+                public void serialize(Proxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+                    List<BaseEntity> proxyList = (List<BaseEntity>) value;
+                    jgen.writeStartArray();
+                    for (BaseEntity proxy : proxyList) {
+                        jgen.writeString(proxy.getId());
+                    }
+                    jgen.writeEndArray();
+                }
+            });
             module.addSerializer(LazyLoadingProxy.class, new JsonSerializer<LazyLoadingProxy>() {
                 @Override
                 public void serialize(LazyLoadingProxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-                    DBRef dbRef = value.toDBRef();
-                    if (dbRef != null) {
-                        jgen.writeString(dbRef.getId().toString());
-                    } else {
-                        //TODO: this is hacky, find a more elegant solution
-                        List<? extends BaseEntity> proxyList = (List<? extends BaseEntity>) value.getTarget();
-                        jgen.writeStartArray();
-                        int size = proxyList.size();
-                        for (int i = 0; i < size; i++) {
-                            jgen.writeString(proxyList.get(i).getId());
-                        }
-                        jgen.writeEndArray();
-                    }
+                    jgen.writeString(value.toDBRef().getId().toString());
                 }
             });
             defaultObjectMapper.registerModule(module);

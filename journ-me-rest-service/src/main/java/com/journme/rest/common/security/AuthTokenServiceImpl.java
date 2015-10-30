@@ -10,10 +10,11 @@ import com.journme.domain.User;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.rest.user.repository.UserRepository;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.NoSuchElementException;
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.ws.rs.core.Response;
@@ -23,11 +24,8 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-@Service
 public class AuthTokenServiceImpl implements AuthTokenService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthTokenServiceImpl.class);
@@ -43,30 +41,19 @@ public class AuthTokenServiceImpl implements AuthTokenService {
     @Autowired
     private UserRepository userRepository;
 
-    //TODO: Stick to convention that any configuration should live in a config class in config package
-    @Autowired
     public AuthTokenServiceImpl(
-            @Value("${cipherPoolMaxTotal:8}") int cipherPoolMaxTotal,
-            @Value("${cipherPoolMaxIdle:4}") int cipherPoolMaxIdle,
-            @Value("${cipherPoolMinIdle:4}") int cipherPoolMinIdle,
-            @Value("${cipherPoolMaxWait:4000}") long cipherPoolMaxWait,
-            @Value("${authTokenExpirationPeriod:2592000000}") long authTokenExpirationPeriod) throws NoSuchAlgorithmException {
-        this.authTokenExpirationPeriod = authTokenExpirationPeriod;
-
-        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
-        poolConfig.setMaxTotal(cipherPoolMaxTotal);
-        poolConfig.setMaxIdle(cipherPoolMaxIdle);
-        poolConfig.setMinIdle(cipherPoolMinIdle);
-        poolConfig.setMaxWaitMillis(cipherPoolMaxWait);
-
+            GenericObjectPoolConfig poolConfig,
+            long authTokenExpirationPeriod,
+            String secretKeyBase64) throws NoSuchAlgorithmException, InvalidKeyException {
         LOGGER.info("Instantiating cipherPool with configuration: maxTotal={}, maxIdle={}, minIdle={}, maxWait={}",
                 poolConfig.getMaxTotal(), poolConfig.getMaxIdle(), poolConfig.getMinIdle(), poolConfig.getMaxWaitMillis());
-        this.cipherPool = new GenericObjectPool<Cipher>(new AesCbcCipherFactory(), poolConfig);
+        this.cipherPool = new GenericObjectPool<>(new AesCbcCipherFactory(), poolConfig);
 
-        //TODO: You stupid! Once App restarts, all the old "valid" authToken will fail authentication
-        KeyGenerator keyGen = KeyGenerator.getInstance(AesCbcCipherFactory.KEYGEN_ALGORITHM);
-        keyGen.init(256);
-        secretKeyForAuthToken = keyGen.generateKey().getEncoded();
+        this.authTokenExpirationPeriod = authTokenExpirationPeriod;
+        secretKeyForAuthToken = Base64.decodeBase64(secretKeyBase64);
+        if ((secretKeyForAuthToken.length * Byte.SIZE) != AesCbcCipherFactory.KEY_BIT_SIZE) {
+            throw new InvalidKeyException("Secret key must have bit length of " + AesCbcCipherFactory.KEY_BIT_SIZE);
+        }
     }
 
     @Override
@@ -132,10 +119,14 @@ public class AuthTokenServiceImpl implements AuthTokenService {
             System.arraycopy(iv, 0, result, encryptedLength, iv.length);
 
             return result;
-        } catch (Exception e) {
-            // TODO: Return different JM exception code when pool is exhausted
-            throw new JournMeException("Encryption failure",
+        } catch (NoSuchElementException e) {
+            throw new JournMeException("Cipher pool exhausted",
                     Response.Status.SERVICE_UNAVAILABLE,
+                    ExceptionCode.POOL_EXHAUSTED,
+                    e);
+        } catch (Exception e) {
+            throw new JournMeException("Encryption failure",
+                    Response.Status.INTERNAL_SERVER_ERROR,
                     ExceptionCode.INTERNAL_SYSTEM_PROBLEM,
                     e);
         } finally {
@@ -162,9 +153,14 @@ public class AuthTokenServiceImpl implements AuthTokenService {
             byte[] decrypted = cipher.doFinal(message, 0, message.length - ivLength);
 
             return new String(decrypted, 0, decrypted.length, AesCbcCipherFactory.CHARSET);
+        } catch (NoSuchElementException e) {
+            throw new JournMeException("Cipher pool exhausted",
+                    Response.Status.SERVICE_UNAVAILABLE,
+                    ExceptionCode.POOL_EXHAUSTED,
+                    e);
         } catch (Exception e) {
             throw new JournMeException("Decryption failure",
-                    Response.Status.SERVICE_UNAVAILABLE,
+                    Response.Status.INTERNAL_SERVER_ERROR,
                     ExceptionCode.INTERNAL_SYSTEM_PROBLEM,
                     e);
         } finally {

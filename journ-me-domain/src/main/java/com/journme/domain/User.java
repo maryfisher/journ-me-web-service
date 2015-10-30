@@ -23,13 +23,19 @@ public class User extends BaseEntity {
     private String email;
 
     @DBRef(lazy = true)
-    private List<Alias> aliases = new ArrayList<Alias>();
+    private List<Alias> aliases = new ArrayList<>();
 
     @DBRef(lazy = true)
     private Alias currentAlias;
 
     @JsonIgnore
     private String passwordHash;
+
+    @JsonIgnore
+    private byte[] passwordHashSalt;
+
+    @JsonIgnore
+    private int passwordHashIterations;
 
     public String getEmail() {
         return email;
@@ -61,5 +67,21 @@ public class User extends BaseEntity {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public byte[] getPasswordHashSalt() {
+        return passwordHashSalt;
+    }
+
+    public void setPasswordHashSalt(byte[] passwordHashSalt) {
+        this.passwordHashSalt = passwordHashSalt;
+    }
+
+    public int getPasswordHashIterations() {
+        return passwordHashIterations;
+    }
+
+    public void setPasswordHashIterations(int passwordHashIterations) {
+        this.passwordHashIterations = passwordHashIterations;
     }
 }

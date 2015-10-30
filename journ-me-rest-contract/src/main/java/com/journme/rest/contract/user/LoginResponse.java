@@ -18,7 +18,7 @@ public class LoginResponse {
     private Map<String, Object> headerItems;
 
     public LoginResponse() {
-        headerItems = new HashMap<String, Object>();
+        headerItems = new HashMap<>();
     }
 
     public Map<String, Object> getHeaderItems() {

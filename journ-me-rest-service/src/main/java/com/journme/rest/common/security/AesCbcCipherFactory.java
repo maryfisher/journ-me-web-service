@@ -18,6 +18,8 @@ public class AesCbcCipherFactory extends BasePooledObjectFactory<Cipher> {
 
     public static final String KEYGEN_ALGORITHM = "AES";
 
+    public static final int KEY_BIT_SIZE = 256;
+
     public static final Charset CHARSET = Charset.forName("UTF-8");
 
     @Override
@@ -27,6 +29,6 @@ public class AesCbcCipherFactory extends BasePooledObjectFactory<Cipher> {
 
     @Override
     public PooledObject<Cipher> wrap(Cipher cipher) {
-        return new DefaultPooledObject<Cipher>(cipher);
+        return new DefaultPooledObject<>(cipher);
     }
 }

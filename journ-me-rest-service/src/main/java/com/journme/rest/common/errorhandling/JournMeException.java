@@ -4,7 +4,7 @@ import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 
 import javax.ws.rs.core.Response;
 
-public class JournMeException extends IllegalArgumentException {
+public class JournMeException extends RuntimeException {
 
     private final ExceptionCode code;
 

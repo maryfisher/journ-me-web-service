@@ -36,6 +36,7 @@ public class JournMeExceptionDto {
         CLIENT_SERVER_PROBLEM("110"),
         INTERNAL_SYSTEM_PROBLEM("120"),
         UPSTREAM_SYSTEM_PROBLEM("130"),
+        POOL_EXHAUSTED("140"),
 
         //Security issues 2xx
         AUTHENTICATION_FAILED("210"),

@@ -5,7 +5,7 @@ import com.journme.domain.User;
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
-import com.journme.rest.user.repository.UserRepository;
+import com.journme.rest.contract.user.LoginResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
@@ -19,7 +19,6 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 
 /**
  * <h1>Authentication filter</h1>
@@ -41,7 +40,7 @@ public class AuthTokenFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String authToken = requestContext.getHeaders().getFirst("authToken");
+        String authToken = requestContext.getHeaders().getFirst(LoginResponse.AUTH_TOKEN_HEADER_KEY);
 
         User user = authTokenService.unwrapAuthToken(authToken);
         if (user != null) {

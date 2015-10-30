@@ -5,25 +5,25 @@ import com.journme.domain.User;
 import com.journme.rest.alias.repository.AliasRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.security.AuthTokenService;
+import com.journme.rest.common.security.IPasswordHashingService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
 import com.journme.rest.contract.user.RegisterRequest;
 import com.journme.rest.user.repository.UserRepository;
+import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-
-import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 /**
  * <h1>User (authentication/authorization) endpoints</h1>
@@ -49,6 +49,9 @@ public class UserResource {
     @Autowired
     private AuthTokenService authTokenService;
 
+    @Autowired
+    private IPasswordHashingService passwordHashingService;
+
     @POST
     @Path("/authentication/login")
     public LoginResponse login(@NotNull @Valid LoginRequest loginRequest) {
@@ -59,8 +62,7 @@ public class UserResource {
             throw new JournMeException("No user exists with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
-        //TODO: use a hashing algorithm
-        } else if (!user.getPasswordHash().equals(loginRequest.getPassword())) {
+        } else if (!verifyPassword(loginRequest.getPassword(), user)) {
             throw new JournMeException("Wrong password for user with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
@@ -89,14 +91,31 @@ public class UserResource {
 
         User newUser = new User();
         newUser.setEmail(registerRequest.getEmail());
-        newUser.setPasswordHash(registerRequest.getPassword());
         newUser.setCurrentAlias(newUserFirstAlias);
         newUser.getAliases().add(newUserFirstAlias);
-        userRepository.save(newUser);
+        byte[] salt = passwordHashingService.generateSalt();
+        int iterations = IPasswordHashingService.RECOMMENDED_ITERATIONS;
+        String passwordHashBase64 = passwordHashingService.stretchAndHashToBase64(
+                registerRequest.getPassword(),
+                salt,
+                iterations);
+        newUser.setPasswordHash(passwordHashBase64);
+        newUser.setPasswordHashSalt(salt);
+        newUser.setPasswordHashIterations(iterations);
+
+        newUser = userRepository.save(newUser);
 
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));
         return loginResponse;
+    }
+
+    private boolean verifyPassword(String loginPassword, User user) {
+        String loginPasswordHash = passwordHashingService.stretchAndHashToBase64(
+                loginPassword,
+                user.getPasswordHashSalt(),
+                user.getPasswordHashIterations());
+        return user.getPasswordHash().equals(loginPasswordHash);
     }
 
 }
