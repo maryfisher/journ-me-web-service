@@ -1,5 +1,7 @@
 package com.journme.rest.contract.user;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * <h1>POJO for REST serialisation</h1>
  * This class represents the register request REST data transfer object
@@ -10,6 +12,7 @@ package com.journme.rest.contract.user;
  */
 public class RegisterRequest extends LoginRequest {
 
+    @NotBlank
     private String name;
 
     public String getName() {

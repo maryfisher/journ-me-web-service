@@ -27,21 +27,21 @@ public class JerseyExceptionMapper implements ExceptionMapper<Throwable> {
         Response.ResponseBuilder rb;
 
         if (ex instanceof JournMeException) {
-            LOGGER.info("Handled JM exception: ", ex);
             JournMeException jmEx = (JournMeException) ex;
+            if (Response.Status.Family.SERVER_ERROR == jmEx.getHttpStatus().getFamily()) {
+                LOGGER.warn("Unhandled JM exception: ", jmEx);
+            } else {
+                LOGGER.info("Handled JM exception: ", jmEx);
+            }
+
             rb = Response.
                     status(jmEx.getHttpStatus()).
                     entity(new JournMeExceptionDto(jmEx.getCode()));
-        } else if (ex instanceof IllegalArgumentException) {
-            LOGGER.info("Handled illegal argument: ", ex);
-            rb = Response.
-                    status(Response.Status.BAD_REQUEST).
-                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.FILE_TYPE_CORRUPTED_INVALID));
         } else if (ex instanceof ClientErrorException) {
             LOGGER.info("Handled client call issue: ", ex);
             rb = Response.
                     status(((ClientErrorException) ex).getResponse().getStatus()).
-                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.UPSTREAM_SYSTEM_PROBLEM));
+                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.CLIENT_SERVER_PROBLEM));
         } else {
             LOGGER.warn("Unhandled application exception: ", ex);
             rb = Response.

@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,6 +21,7 @@ public abstract class BaseEntity {
     private String id;
 
     @Version
+    @JsonIgnore
     private Long version;
 
     @CreatedDate
@@ -58,5 +60,20 @@ public abstract class BaseEntity {
 
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public boolean equalsId(String otherId) {
+        return id != null && id.equals(otherId);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // A new entity not yet saved against the DB cannot equal another entity
+        return this == other || id != null && other instanceof BaseEntity && id.equals(((BaseEntity) other).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,12 +23,19 @@ public class User extends BaseEntity {
     private String email;
 
     @DBRef(lazy = true)
-    private List<Alias> aliases = new ArrayList<Alias>();
+    private List<Alias> aliases = new ArrayList<>();
 
     @DBRef(lazy = true)
     private Alias currentAlias;
 
-    private String password;
+    @JsonIgnore
+    private String passwordHash;
+
+    @JsonIgnore
+    private byte[] passwordHashSalt;
+
+    @JsonIgnore
+    private int passwordHashIterations;
 
     public String getEmail() {
         return email;
@@ -53,11 +61,27 @@ public class User extends BaseEntity {
         this.currentAlias = currentAlias;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public byte[] getPasswordHashSalt() {
+        return passwordHashSalt;
+    }
+
+    public void setPasswordHashSalt(byte[] passwordHashSalt) {
+        this.passwordHashSalt = passwordHashSalt;
+    }
+
+    public int getPasswordHashIterations() {
+        return passwordHashIterations;
+    }
+
+    public void setPasswordHashIterations(int passwordHashIterations) {
+        this.passwordHashIterations = passwordHashIterations;
     }
 }

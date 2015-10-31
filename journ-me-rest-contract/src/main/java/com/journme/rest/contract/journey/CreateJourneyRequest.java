@@ -1,6 +1,9 @@
 package com.journme.rest.contract.journey;
 
 import com.journme.domain.JourneyBase;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * <h1>POJO for REST serialisation</h1>
@@ -12,8 +15,11 @@ import com.journme.domain.JourneyBase;
  */
 public class CreateJourneyRequest {
 
+    @NotBlank
     private String aliasId;
 
+    @NotNull
+    @Valid
     private JourneyBase journey;
 
     public String getAliasId() {

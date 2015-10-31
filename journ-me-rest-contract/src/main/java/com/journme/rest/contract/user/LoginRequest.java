@@ -1,5 +1,8 @@
 package com.journme.rest.contract.user;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * <h1>POJO for REST serialisation</h1>
  * This class represents the login request REST data transfer object
@@ -10,8 +13,11 @@ package com.journme.rest.contract.user;
  */
 public class LoginRequest {
 
+    @NotBlank
+    @Email
     private String email;
 
+    @NotBlank
     private String password;
 
     public String getEmail() {

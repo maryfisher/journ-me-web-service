@@ -4,23 +4,26 @@ import com.journme.domain.Alias;
 import com.journme.domain.User;
 import com.journme.rest.alias.repository.AliasRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.common.security.AuthTokenService;
+import com.journme.rest.common.security.IPasswordHashingService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
 import com.journme.rest.contract.user.RegisterRequest;
 import com.journme.rest.user.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-
 import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 
 /**
  * <h1>User (authentication/authorization) endpoints</h1>
@@ -43,9 +46,15 @@ public class UserResource {
     @Autowired
     private AliasRepository aliasRepository;
 
+    @Autowired
+    private AuthTokenService authTokenService;
+
+    @Autowired
+    private IPasswordHashingService passwordHashingService;
+
     @POST
     @Path("/authentication/login")
-    public LoginResponse login(LoginRequest loginRequest) {
+    public LoginResponse login(@NotNull @Valid LoginRequest loginRequest) {
         LOGGER.info("Incoming request to login user with email {}", loginRequest.getEmail());
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
@@ -53,23 +62,22 @@ public class UserResource {
             throw new JournMeException("No user exists with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
-        } else if (!user.getPassword().equals(loginRequest.getPassword())) {
+        } else if (!verifyPassword(loginRequest.getPassword(), user)) {
             throw new JournMeException("Wrong password for user with email " + loginRequest.getEmail(),
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
         } else {
             LoginResponse loginResponse = new LoginResponse();
-            loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, loginRequest.getEmail());
+            loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
             return loginResponse;
         }
     }
 
     @POST
     @Path("/authentication/register")
-    public LoginResponse register(RegisterRequest registerRequest) {
+    public LoginResponse register(@NotNull @Valid RegisterRequest registerRequest) {
         LOGGER.info("Incoming request to register user with email {}", registerRequest.getEmail());
 
-        //TODO: move validation to Java Bean Validation framework
         User existingUser = userRepository.findByEmail(registerRequest.getEmail());
         if (existingUser != null) {
             throw new JournMeException("User already exists with email " + registerRequest.getEmail(),
@@ -79,18 +87,35 @@ public class UserResource {
 
         Alias newUserFirstAlias = new Alias();
         newUserFirstAlias.setName(registerRequest.getName());
-        aliasRepository.save(newUserFirstAlias);
+        newUserFirstAlias = aliasRepository.save(newUserFirstAlias);
 
         User newUser = new User();
         newUser.setEmail(registerRequest.getEmail());
-        newUser.setPassword(registerRequest.getPassword());
         newUser.setCurrentAlias(newUserFirstAlias);
         newUser.getAliases().add(newUserFirstAlias);
-        userRepository.save(newUser);
+        byte[] salt = passwordHashingService.generateSalt();
+        int iterations = IPasswordHashingService.RECOMMENDED_ITERATIONS;
+        String passwordHashBase64 = passwordHashingService.stretchAndHashToBase64(
+                registerRequest.getPassword(),
+                salt,
+                iterations);
+        newUser.setPasswordHash(passwordHashBase64);
+        newUser.setPasswordHashSalt(salt);
+        newUser.setPasswordHashIterations(iterations);
+
+        newUser = userRepository.save(newUser);
 
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.getHeaderItems().put(LoginResponse.AUTH_TOKEN_HEADER_KEY, "Teddy");
+        loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));
         return loginResponse;
+    }
+
+    private boolean verifyPassword(String loginPassword, User user) {
+        String loginPasswordHash = passwordHashingService.stretchAndHashToBase64(
+                loginPassword,
+                user.getPasswordHashSalt(),
+                user.getPasswordHashIterations());
+        return user.getPasswordHash().equals(loginPasswordHash);
     }
 
 }
