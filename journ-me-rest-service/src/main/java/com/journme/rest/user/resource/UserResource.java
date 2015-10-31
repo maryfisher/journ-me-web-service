@@ -1,8 +1,8 @@
 package com.journme.rest.user.resource;
 
-import com.journme.domain.Alias;
+import com.journme.domain.AliasBase;
 import com.journme.domain.User;
-import com.journme.rest.alias.repository.AliasRepository;
+import com.journme.rest.alias.repository.AliasBaseRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.common.security.IPasswordHashingService;
@@ -11,6 +11,12 @@ import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
 import com.journme.rest.contract.user.RegisterRequest;
 import com.journme.rest.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -19,11 +25,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 
 /**
  * <h1>User (authentication/authorization) endpoints</h1>
@@ -44,7 +45,7 @@ public class UserResource {
     private UserRepository userRepository;
 
     @Autowired
-    private AliasRepository aliasRepository;
+    private AliasBaseRepository aliasBaseRepository;
 
     @Autowired
     private AuthTokenService authTokenService;
@@ -85,9 +86,9 @@ public class UserResource {
                     JournMeExceptionDto.ExceptionCode.EMAIL_TAKEN);
         }
 
-        Alias newUserFirstAlias = new Alias();
+        AliasBase newUserFirstAlias = new AliasBase();
         newUserFirstAlias.setName(registerRequest.getName());
-        newUserFirstAlias = aliasRepository.save(newUserFirstAlias);
+        aliasBaseRepository.save(newUserFirstAlias);
 
         User newUser = new User();
         newUser.setEmail(registerRequest.getEmail());

@@ -19,14 +19,14 @@ import java.util.List;
 @Document(collection = "user")
 public class User extends BaseEntity {
 
-    @Indexed(unique = true)
+    @Indexed
     private String email;
 
-    @DBRef(lazy = true)
-    private List<Alias> aliases = new ArrayList<>();
+    @DBRef
+    private List<AliasBase> aliases = new ArrayList<>();
 
-    @DBRef(lazy = true)
-    private Alias currentAlias;
+    @DBRef
+    private AliasBase currentAlias;
 
     @JsonIgnore
     private String passwordHash;
@@ -45,19 +45,19 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    public List<Alias> getAliases() {
+    public List<AliasBase> getAliases() {
         return aliases;
     }
 
-    public void setAliases(List<Alias> aliases) {
+    public void setAliases(List<AliasBase> aliases) {
         this.aliases = aliases;
     }
 
-    public Alias getCurrentAlias() {
+    public AliasBase getCurrentAlias() {
         return currentAlias;
     }
 
-    public void setCurrentAlias(Alias currentAlias) {
+    public void setCurrentAlias(AliasBase currentAlias) {
         this.currentAlias = currentAlias;
     }
 

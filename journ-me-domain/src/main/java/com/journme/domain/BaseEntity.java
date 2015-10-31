@@ -76,4 +76,11 @@ public abstract class BaseEntity {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
+
+    public BaseEntity clone(BaseEntity other) {
+        if (other.id != null) {
+            this.id = other.id;
+        }
+        return this;
+    }
 }
