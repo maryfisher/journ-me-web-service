@@ -8,8 +8,8 @@
     <packaging>jar</packaging>
 
     <parent>
-        <artifactId>journ-me-web-service</artifactId>
         <groupId>com.journme</groupId>
+        <artifactId>journ-me-web-service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 

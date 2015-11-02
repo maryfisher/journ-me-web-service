@@ -87,12 +87,18 @@ public abstract class BaseEntity {
     public static abstract class BaseImageEntity extends BaseEntity {
 
         private byte[] image;
-
         private byte[] thumbnail;
-
         private String name;
-
         private String mediaType;
+
+        public BaseImageEntity() {
+        }
+
+        public BaseImageEntity(String name, String mediaType, byte[] image) {
+            this.name = name;
+            this.mediaType = mediaType;
+            this.image = image;
+        }
 
         public byte[] getImage() {
             return image;

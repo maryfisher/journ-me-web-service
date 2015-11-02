@@ -1,6 +1,7 @@
 package com.journme.domain;
 
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,15 +11,23 @@ import java.util.List;
  * @version 1.0
  * @since 28.10.2015
  */
+@Document(collection = "blink")
 public class Blink extends BaseEntity {
 
     private Integer format = 0;
-    private List<String> images = new ArrayList<>();
+
+    @DBRef(lazy = true)
+    private List<BlinkImage> images = new ArrayList<>();
+
     private List<String> texts = new ArrayList<>();
+
     private Integer index;
+
     @DBRef(lazy = true)
     private MomentBase moment;
+
     private Integer ratio = 48;
+
     @DBRef
     private List<State> states = new ArrayList<>();
 
@@ -30,11 +39,11 @@ public class Blink extends BaseEntity {
         this.format = format;
     }
 
-    public List<String> getImages() {
+    public List<BlinkImage> getImages() {
         return images;
     }
 
-    public void setImages(List<String> images) {
+    public void setImages(List<BlinkImage> images) {
         this.images = images;
     }
 

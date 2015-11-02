@@ -15,6 +15,7 @@ public class MomentBase extends BaseEntity {
 
     @DBRef
     private AliasBase alias;
+
     @DBRef
     private JourneyBase journey;
 

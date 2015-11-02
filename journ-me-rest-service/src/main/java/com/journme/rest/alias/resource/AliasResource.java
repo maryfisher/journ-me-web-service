@@ -7,7 +7,6 @@ import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.contract.ImageClassifier;
-import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.hibernate.validator.constraints.NotBlank;
@@ -23,7 +22,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * @author mary_fisher
@@ -52,14 +50,15 @@ public class AliasResource extends AbstractResource {
     @ProtectedByAuthToken
     public AliasBase updateAlias(
             @NotBlank @PathParam("aliasId") String aliasId,
-            @NotNull @FormDataParam("file") FormDataBodyPart imageBodyPart,
+            @FormDataParam("file") FormDataBodyPart imagePart,
             @NotNull @Valid @FormDataParam("alias") AliasBase changedAlias) throws IOException {
         LOGGER.info("Incoming request to update alias {}", aliasId);
-        AliasBase existingAlias = aliasService.getAliasBase(aliasId);
-        byte[] image = IOUtils.toByteArray(imageBodyPart.getValueAs(InputStream.class));
+        AliasBase existingAlias = assertAliasInContext(aliasId);
+
+        byte[] image = toByteArray(imagePart);
         if (image != null && image.length > 0) {
-            String imageName = imageBodyPart.getContentDisposition().getFileName();
-            String mimeType = imageBodyPart.getMediaType().toString();
+            String imageName = imagePart.getContentDisposition().getFileName();
+            String mimeType = imagePart.getMediaType().toString();
             AliasImage aliasImage = existingAlias.getImage() != null ? existingAlias.getImage() : new AliasImage();
             aliasImage.setName(imageName);
             aliasImage.setMediaType(mimeType);

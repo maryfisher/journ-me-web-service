@@ -47,15 +47,15 @@ public class FeedbackResource extends AbstractResource {
             @NotBlank @QueryParam("aliasId") String aliasId,
             @NotBlank @QueryParam("momentId") String momentId,
             @NotNull @Valid Feedback feedback) {
-        LOGGER.info("Incoming request to create a new moment");
+        LOGGER.info("Incoming request to create a new feedback under moment {} for alias {}", momentId, aliasId);
 
+        AliasBase alias = assertAliasInContext(aliasId);
         MomentDetail moment = momentService.getMomentDetail(momentId);
-        AliasBase alias = aliasService.getAliasBase(aliasId);
 
         feedback.setAlias(alias);
         feedback.setMoment(new MomentBase().clone(moment));
         feedback.setId(null); //ensures that new Moment is created in the collection
-        feedbackRepository.save(feedback);
+        feedback = feedbackRepository.save(feedback);
 
         moment.getFeedback().add(feedback);
         momentService.save(moment);

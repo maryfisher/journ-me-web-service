@@ -88,7 +88,7 @@ public class UserResource {
 
         AliasBase newUserFirstAlias = new AliasBase();
         newUserFirstAlias.setName(registerRequest.getName());
-        aliasBaseRepository.save(newUserFirstAlias);
+        newUserFirstAlias = aliasBaseRepository.save(newUserFirstAlias);
 
         User newUser = new User();
         newUser.setEmail(registerRequest.getEmail());

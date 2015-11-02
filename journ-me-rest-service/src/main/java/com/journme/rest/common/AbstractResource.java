@@ -5,6 +5,8 @@ import com.journme.domain.User;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.AuthTokenFilter;
 import com.journme.rest.contract.JournMeExceptionDto;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.springframework.http.MediaType;
 
 import javax.ws.rs.Consumes;
@@ -12,6 +14,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -31,7 +35,7 @@ public abstract class AbstractResource {
         return ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser();
     }
 
-    protected AliasBase returnAliasFromContext(String theAliasId) {
+    protected AliasBase assertAliasInContext(String theAliasId) {
         List<AliasBase> userAliases = ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser().getAliases();
 
         for (AliasBase userAlias : userAliases) {
@@ -43,4 +47,9 @@ public abstract class AbstractResource {
                 Response.Status.BAD_REQUEST,
                 JournMeExceptionDto.ExceptionCode.ALIAS_NONEXISTENT);
     }
+
+    protected byte[] toByteArray(FormDataBodyPart imagePart) throws IOException {
+        return imagePart != null ? IOUtils.toByteArray(imagePart.getValueAs(InputStream.class)) : null;
+    }
+
 }
