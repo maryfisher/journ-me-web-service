@@ -2,6 +2,7 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.*;
 import com.journme.rest.alias.service.AliasService;
+import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.journey.service.JourneyService;
 import com.journme.rest.moment.service.MomentService;
@@ -9,7 +10,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
@@ -24,9 +24,7 @@ import javax.ws.rs.*;
  */
 @Component
 @Singleton
-@Consumes(MediaType.APPLICATION_JSON_VALUE)
-@Produces(MediaType.APPLICATION_JSON_VALUE)
-public class MomentResource {
+public class MomentResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MomentResource.class);
 
@@ -41,7 +39,7 @@ public class MomentResource {
 
     @GET
     @Path("/{momentId}")
-    public MomentDetail retrieveMoment(@PathParam("momentId") String momentId) {
+    public MomentDetail retrieveMoment(@NotBlank @PathParam("momentId") String momentId) {
         LOGGER.info("Incoming request to retrieve moment {}", momentId);
         return momentService.getMomentDetail(momentId);
     }
@@ -73,8 +71,8 @@ public class MomentResource {
     @Path("/{momentId}")
     @ProtectedByAuthToken
     public MomentBase updateMoment(
-            @PathParam("momentId") String momentId,
-            MomentBase changedMoment) {
+            @NotBlank @PathParam("momentId") String momentId,
+            @NotNull @Valid MomentBase changedMoment) {
         LOGGER.info("Incoming request to update moment {}", momentId);
         MomentBase existingMoment = momentService.getMomentBase(momentId);
         existingMoment.copy(changedMoment);

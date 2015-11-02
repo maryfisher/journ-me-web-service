@@ -3,6 +3,7 @@ package com.journme.rest.moment.resource;
 import com.journme.domain.Blink;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
+import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.contract.JournMeExceptionDto;
@@ -12,10 +13,11 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
@@ -26,9 +28,7 @@ import javax.ws.rs.core.Response;
  */
 @Component
 @Singleton
-@Consumes(MediaType.APPLICATION_JSON_VALUE)
-@Produces(MediaType.APPLICATION_JSON_VALUE)
-public class BlinkResource {
+public class BlinkResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlinkResource.class);
 
@@ -40,7 +40,7 @@ public class BlinkResource {
 
     @GET
     @Path("/{blinkId}/")
-    public Blink retrieveBlink(@PathParam("blinkId") String blinkId) {
+    public Blink retrieveBlink(@NotBlank @PathParam("blinkId") String blinkId) {
         LOGGER.info("Incoming request to retrieve blink {}", blinkId);
         return blinkRepository.findOne(blinkId);
     }
@@ -49,7 +49,7 @@ public class BlinkResource {
     @ProtectedByAuthToken
     public Blink createBlink(
             @NotBlank @QueryParam("momentId") String momentId,
-            Blink blink) {
+            @NotNull @Valid Blink blink) {
         LOGGER.info("Incoming request to create a new blink");
 
         MomentDetail moment = momentService.getMomentDetail(momentId);
@@ -69,8 +69,8 @@ public class BlinkResource {
     @Path("/{blinkId}")
     @ProtectedByAuthToken
     public Blink updateMoment(
-            @PathParam("blinkId") String blinkId,
-            Blink changedBlink) {
+            @NotBlank @PathParam("blinkId") String blinkId,
+            @NotNull @Valid Blink changedBlink) {
         LOGGER.info("Incoming request to update blink {}", blinkId);
         Blink existingBlink = blinkRepository.findOne(blinkId);
         if (existingBlink == null) {

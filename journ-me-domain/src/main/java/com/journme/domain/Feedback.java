@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class Feedback extends BaseEntity {
     @DBRef(lazy = true)
     private MomentBase moment;
 
+    @NotBlank
     private String body;
 
     @DBRef

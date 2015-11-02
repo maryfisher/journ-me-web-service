@@ -5,6 +5,7 @@ import com.journme.domain.Feedback;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.alias.service.AliasService;
+import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.moment.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;
@@ -12,13 +13,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
-import javax.ws.rs.Consumes;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 /**
@@ -28,9 +28,7 @@ import javax.ws.rs.QueryParam;
  */
 @Component
 @Singleton
-@Consumes(MediaType.APPLICATION_JSON_VALUE)
-@Produces(MediaType.APPLICATION_JSON_VALUE)
-public class FeedbackResource {
+public class FeedbackResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FeedbackResource.class);
 
@@ -48,7 +46,7 @@ public class FeedbackResource {
     public Feedback createFeedback(
             @NotBlank @QueryParam("aliasId") String aliasId,
             @NotBlank @QueryParam("momentId") String momentId,
-            Feedback feedback) {
+            @NotNull @Valid Feedback feedback) {
         LOGGER.info("Incoming request to create a new moment");
 
         MomentDetail moment = momentService.getMomentDetail(momentId);

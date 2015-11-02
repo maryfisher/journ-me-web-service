@@ -83,4 +83,47 @@ public abstract class BaseEntity {
         }
         return this;
     }
+
+    public static abstract class BaseImageEntity extends BaseEntity {
+
+        private byte[] image;
+
+        private byte[] thumbnail;
+
+        private String name;
+
+        private String mediaType;
+
+        public byte[] getImage() {
+            return image;
+        }
+
+        public void setImage(byte[] image) {
+            this.image = image;
+        }
+
+        public byte[] getThumbnail() {
+            return thumbnail;
+        }
+
+        public void setThumbnail(byte[] thumbnail) {
+            this.thumbnail = thumbnail;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getMediaType() {
+            return mediaType;
+        }
+
+        public void setMediaType(String mediaType) {
+            this.mediaType = mediaType;
+        }
+    }
 }
