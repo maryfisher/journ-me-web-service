@@ -45,6 +45,8 @@ public class JournMeExceptionDto {
         //Incoming value issues 3xx
         ALIAS_NONEXISTENT("310"),
         JOURNEY_NONEXISTENT("311"),
+        BLINK_NONEXISTENT("312"),
+        MOMENT_NONEXISTENT("313"),
         EMAIL_TAKEN("320"),
         FILE_TYPE_CORRUPTED_INVALID("330"),
         FILE_TOO_BIG("331"),

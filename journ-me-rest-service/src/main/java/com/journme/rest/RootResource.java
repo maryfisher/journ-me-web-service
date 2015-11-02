@@ -1,6 +1,11 @@
 package com.journme.rest;
 
+import com.journme.rest.alias.resource.AliasResource;
 import com.journme.rest.journey.resource.JourneyResource;
+import com.journme.rest.moment.resource.BlinkResource;
+import com.journme.rest.moment.resource.FeedbackResource;
+import com.journme.rest.moment.resource.MomentResource;
+import com.journme.rest.state.resource.StateResource;
 import com.journme.rest.user.resource.UserResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +51,31 @@ public class RootResource {
     @Path("/user")
     public Class<UserResource> getUserResource() {
         return UserResource.class;
+    }
+
+    @Path("/alias")
+    public Class<AliasResource> getAliasResource() {
+        return AliasResource.class;
+    }
+
+    @Path("/moment")
+    public Class<MomentResource> getMomentResource() {
+        return MomentResource.class;
+    }
+
+    @Path("/state")
+    public Class<StateResource> getStateResource() {
+        return StateResource.class;
+    }
+
+    @Path("/feedback")
+    public Class<FeedbackResource> getFeedbackResource() {
+        return FeedbackResource.class;
+    }
+
+    @Path("/blink")
+    public Class<BlinkResource> getBlinkResource() {
+        return BlinkResource.class;
     }
 
 }

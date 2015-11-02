@@ -1,14 +1,14 @@
 package com.journme.rest.common.filter;
 
-import com.journme.domain.Alias;
 import com.journme.domain.User;
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.rest.contract.user.LoginResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -16,9 +16,8 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+import java.security.Principal;
 
 /**
  * <h1>Authentication filter</h1>
@@ -53,22 +52,6 @@ public class AuthTokenFilter implements ContainerRequestFilter {
         }
     }
 
-    public static User returnUserFromContext(SecurityContext sc) {
-        return ((UserPrincipal)sc.getUserPrincipal()).user;
-    }
-
-    // theAlias can either be an instance of Alias or of String
-    public static Alias returnAliasFromContext(SecurityContext sc, String theAliasId) {
-        List<Alias> userAliases = ((UserPrincipal)sc.getUserPrincipal()).user.getAliases();
-
-        for (Alias userAlias : userAliases) {
-            if (userAlias.equalsId(theAliasId)) {
-                return userAlias;
-            }
-        }
-        return null;
-    }
-
     private static class JMSecurityContext implements SecurityContext {
 
         private final SecurityContext originalSc;
@@ -101,7 +84,7 @@ public class AuthTokenFilter implements ContainerRequestFilter {
         }
     }
 
-    private static class UserPrincipal implements Principal {
+    public static class UserPrincipal implements Principal {
 
         private final User user;
 
@@ -113,10 +96,14 @@ public class AuthTokenFilter implements ContainerRequestFilter {
             }
         }
 
+        public User getUser() {
+            return user;
+        }
+
         @Override
         public boolean equals(Object other) {
             return (this == other) ||
-                    (other instanceof Principal) && getName().equals(((Principal)other).getName());
+                    (other instanceof Principal) && getName().equals(((Principal) other).getName());
         }
 
         @Override

@@ -26,8 +26,8 @@ public class JourneyBase extends BaseEntity {
 
     private String description;
 
-    @DBRef(lazy = true)
-    private Alias alias;
+    @DBRef
+    private AliasBase alias;
 
     private JoinType join = JoinType.NONE;
 
@@ -49,11 +49,11 @@ public class JourneyBase extends BaseEntity {
         this.description = description;
     }
 
-    public Alias getAlias() {
+    public AliasBase getAlias() {
         return alias;
     }
 
-    public void setAlias(Alias alias) {
+    public void setAlias(AliasBase alias) {
         this.alias = alias;
     }
 
@@ -89,5 +89,12 @@ public class JourneyBase extends BaseEntity {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
+    }
+
+    @Override
+    public JourneyBase clone(BaseEntity other) {
+        super.clone(other);
+        copy((JourneyBase) other);
+        return this;
     }
 }

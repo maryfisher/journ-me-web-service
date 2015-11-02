@@ -15,37 +15,37 @@ import java.util.List;
  */
 public class JourneyDetails extends JourneyBase {
 
-    @DBRef(lazy = true)
-    private List<Moment> moments = new ArrayList<>();
+    @DBRef
+    private List<MomentBase> moments = new ArrayList<>();
 
-    @DBRef(lazy = true)
-    private List<Alias> followers = new ArrayList<>();
+    @DBRef
+    private List<AliasBase> followers = new ArrayList<>();
 
-    @DBRef(lazy = true)
+    @DBRef
     private List<JourneyBase> linkedToJourneys = new ArrayList<>();
 
-    @DBRef(lazy = true)
+    @DBRef
     private List<JourneyBase> linkedFromJourneys = new ArrayList<>();
 
-    @DBRef(lazy = true)
-    private List<Alias> joinedAliases = new ArrayList<>();
+    @DBRef
+    private List<AliasBase> joinedAliases = new ArrayList<>();
 
-    @DBRef(lazy = true)
-    private List<Alias> joinRequests = new ArrayList<>();
+    @DBRef
+    private List<AliasBase> joinRequests = new ArrayList<>();
 
-    public List<Moment> getMoments() {
+    public List<MomentBase> getMoments() {
         return moments;
     }
 
-    public void setMoments(List<Moment> moments) {
+    public void setMoments(List<MomentBase> moments) {
         this.moments = moments;
     }
 
-    public List<Alias> getFollowers() {
+    public List<AliasBase> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<Alias> followers) {
+    public void setFollowers(List<AliasBase> followers) {
         this.followers = followers;
     }
 
@@ -65,19 +65,19 @@ public class JourneyDetails extends JourneyBase {
         this.linkedFromJourneys = linkedFromJourneys;
     }
 
-    public List<Alias> getJoinedAliases() {
+    public List<AliasBase> getJoinedAliases() {
         return joinedAliases;
     }
 
-    public void setJoinedAliases(List<Alias> joinedAliases) {
+    public void setJoinedAliases(List<AliasBase> joinedAliases) {
         this.joinedAliases = joinedAliases;
     }
 
-    public List<Alias> getJoinRequests() {
+    public List<AliasBase> getJoinRequests() {
         return joinRequests;
     }
 
-    public void setJoinRequests(List<Alias> joinRequests) {
+    public void setJoinRequests(List<AliasBase> joinRequests) {
         this.joinRequests = joinRequests;
     }
 }

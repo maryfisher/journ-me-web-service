@@ -1,34 +1,23 @@
 package com.journme.rest.journey.resource;
 
-import com.journme.domain.Alias;
+import com.journme.domain.AliasBase;
+import com.journme.domain.AliasDetail;
 import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
-import com.journme.rest.alias.repository.AliasRepository;
-import com.journme.rest.common.errorhandling.JournMeException;
-import com.journme.rest.common.filter.AuthTokenFilter;
+import com.journme.rest.alias.service.AliasService;
+import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
-import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
-import com.journme.rest.contract.journey.CreateJourneyRequest;
-import com.journme.rest.journey.repository.JourneyBaseRepository;
-import com.journme.rest.journey.repository.JourneyDetailsRepository;
-import javax.inject.Singleton;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.SecurityContext;
+import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Singleton;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.*;
 
 /**
  * <h1>Journey endpoints</h1>
@@ -39,48 +28,40 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Singleton
-@Consumes(MediaType.APPLICATION_JSON_VALUE)
-@Produces(MediaType.APPLICATION_JSON_VALUE)
-public class JourneyResource {
+public class JourneyResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JourneyResource.class);
 
     @Autowired
-    private JourneyDetailsRepository journeyDetailsRepository;
+    private JourneyService journeyService;
 
     @Autowired
-    private JourneyBaseRepository journeyBaseRepository;
-
-    @Autowired
-    private AliasRepository aliasRepository;
-
-    //Runtime will inject request-scoped proxy into singleton resource class field
-    @Context
-    private SecurityContext securityContext;
+    private AliasService aliasService;
 
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
         LOGGER.info("Incoming request to retrieve journey {}", journeyId);
-        return journeyDetailsRepository.findOne(journeyId);
+        return journeyService.getJourneyDetail(journeyId);
     }
 
     @POST
     @ProtectedByAuthToken
-    public JourneyBase createJourney(@NotNull @Valid CreateJourneyRequest createRequest) {
-        JourneyBase journey = createRequest.getJourney();
+    public JourneyBase createJourney(
+            @NotBlank @QueryParam("aliasId") String aliasId,
+            @NotNull @Valid JourneyBase journey) {
         LOGGER.info("Incoming request to create a journey with name {}", journey.getName());
 
-        Alias alias = AuthTokenFilter.returnAliasFromContext(securityContext, createRequest.getAliasId());
-        if (alias != null) {
-            journey.setAlias(alias);
-            journey.setId(null); //ensures that new Journey is created in the collection
-            return journeyBaseRepository.save(journey);
-        } else {
-            throw new JournMeException("User does not own given alias " + createRequest.getAliasId(),
-                    Response.Status.BAD_REQUEST,
-                    ExceptionCode.ALIAS_NONEXISTENT);
-        }
+        AliasBase aliasBase = returnAliasFromContext(aliasId);
+        AliasDetail alias = aliasService.getAliasDetail(aliasId);
+        journey.setAlias(aliasBase);
+        journey.setId(null); //ensures that new Journey is created in the collection
+        journeyService.save(journey);
+
+        alias.getJourneys().add(journey);
+        aliasService.save(alias);
+
+        return journey;
     }
 
     @POST
@@ -91,24 +72,128 @@ public class JourneyResource {
             @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
 
-        JourneyBase existingJourney = journeyBaseRepository.findOne(journeyId);
-        if (existingJourney != null) {
-            Alias journeyAlias = existingJourney.getAlias();
-            Alias userAlias = AuthTokenFilter.returnAliasFromContext(securityContext, journeyAlias.getId());
+        JourneyBase existingJourney = journeyService.getJourneyBase(journeyId);
+        returnAliasFromContext(existingJourney.getAlias().getId());
+        existingJourney.copy(changedJourney);
 
-            if (userAlias != null) {
-                existingJourney.copy(changedJourney);
-                return journeyBaseRepository.save(existingJourney);
-            } else {
-                throw new JournMeException("User does not own given journey " + journeyId,
-                        Response.Status.BAD_REQUEST,
-                        ExceptionCode.JOURNEY_NONEXISTENT);
-            }
-        } else {
-            throw new JournMeException("No journey exists for given journey " + journeyId,
-                    Response.Status.BAD_REQUEST,
-                    ExceptionCode.JOURNEY_NONEXISTENT);
-        }
+        return journeyService.save(existingJourney);
     }
 
+    @POST
+    @Path("/{journeyId}/follow/{aliasId}")
+    @ProtectedByAuthToken
+    public void followJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("aliasId") String aliasId) {
+        LOGGER.info("Incoming request to follow journey {} with alias {}", journeyId, aliasId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+
+        journey.getFollowers().add(aliasDetail);
+        journeyService.save(journey);
+        aliasDetail.getFollowedJourneys().add(journey);
+    }
+
+    @POST
+    @Path("/{journeyId}/unfollow/{aliasId}")
+    @ProtectedByAuthToken
+    public void unfollowJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("aliasId") String aliasId) {
+        LOGGER.info("Incoming request to unfollow journey {} with alias {}", journeyId, aliasId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+
+        journey.getFollowers().remove(aliasDetail);
+        journeyService.save(journey);
+        aliasDetail.getFollowedJourneys().remove(journey);
+    }
+
+    @POST
+    @Path("/{journeyId}/link/{linkedJourneyId}")
+    @ProtectedByAuthToken
+    public void linkJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("linkedJourneyId") String linkedJourneyId) {
+        LOGGER.info("Incoming request to link journey {} from journey {}", journeyId, linkedJourneyId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetails linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
+
+        journey.getLinkedFromJourneys().add(linkedJourney);
+        journeyService.save(journey);
+        linkedJourney.getLinkedToJourneys().add(journey);
+        journeyService.save(linkedJourney);
+    }
+
+    @POST
+    @Path("/{journeyId}/unlink/{linkedJourneyId}")
+    @ProtectedByAuthToken
+    public JourneyDetails unlinkJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("linkedJourneyId") String linkedJourneyId) {
+        LOGGER.info("Incoming request to unlink journey {} from journey {}", journeyId, linkedJourneyId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetails linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
+
+        journey.getLinkedFromJourneys().remove(linkedJourney);
+        journeyService.save(journey);
+        linkedJourney.getLinkedToJourneys().remove(journey);
+        journeyService.save(linkedJourney);
+
+        return journey;
+    }
+
+    @POST
+    @Path("/{journeyId}/requestJoin/{aliasId}")
+    @ProtectedByAuthToken
+    public void requestJoinJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("aliasId") String aliasId) {
+        LOGGER.info("Incoming request to request joining journey {} with alias {}", journeyId, aliasId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+
+        journey.getJoinRequests().add(aliasDetail);
+        journeyService.save(journey);
+    }
+
+    @POST
+    @Path("/{journeyId}/acceptJoin/{aliasId}")
+    @ProtectedByAuthToken
+    public void acceptJoinJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("aliasId") String aliasId) {
+        LOGGER.info("Incoming request to accept joining journey {} with alias {}", journeyId, aliasId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+
+        journey.getJoinRequests().remove(aliasDetail);
+        journey.getJoinedAliases().add(aliasDetail);
+        journeyService.save(journey);
+        aliasDetail.getJoinedJourneys().add(journey);
+        aliasService.save(aliasDetail);
+    }
+
+    @POST
+    @Path("/{journeyId}/removeJoin/{aliasId}")
+    @ProtectedByAuthToken
+    public void removeJoinJourney(
+            @PathParam("journeyId") String journeyId,
+            @PathParam("aliasId") String aliasId) {
+        LOGGER.info("Incoming request to unjoin journey {} with alias {}", journeyId, aliasId);
+
+        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+
+        journey.getJoinedAliases().remove(aliasDetail);
+        journeyService.save(journey);
+        aliasDetail.getJoinedJourneys().remove(journey);
+        aliasService.save(aliasDetail);
+    }
 }
