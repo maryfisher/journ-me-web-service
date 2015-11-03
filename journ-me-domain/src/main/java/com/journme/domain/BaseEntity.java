@@ -25,7 +25,7 @@ public abstract class BaseEntity {
     private Long version;
 
     @CreatedDate
-    private Date createdAt;
+    private Date created;
 
     @LastModifiedDate
     private Date lastModified;
@@ -46,12 +46,12 @@ public abstract class BaseEntity {
         this.version = version;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreated() {
+        return created;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Date getLastModified() {

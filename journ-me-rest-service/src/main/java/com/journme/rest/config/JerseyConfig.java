@@ -1,10 +1,7 @@
 package com.journme.rest.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.journme.domain.BaseEntity;
 import com.journme.rest.RootResource;
@@ -57,6 +54,7 @@ public class JerseyConfig extends ResourceConfig {
         public CustomObjectMapperProvider() {
             defaultObjectMapper = new ObjectMapper();
             defaultObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             final SimpleModule module = new SimpleModule("MongoDBRefSerializer");
             module.addSerializer(Proxy.class, new JsonSerializer<Proxy>() {

@@ -68,7 +68,7 @@ public class UserResource {
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
         } else {
-            LoginResponse loginResponse = new LoginResponse();
+            LoginResponse loginResponse = new LoginResponse(user);
             loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
             return loginResponse;
         }
@@ -106,7 +106,7 @@ public class UserResource {
 
         newUser = userRepository.save(newUser);
 
-        LoginResponse loginResponse = new LoginResponse();
+        LoginResponse loginResponse = new LoginResponse(newUser);
         loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));
         return loginResponse;
     }

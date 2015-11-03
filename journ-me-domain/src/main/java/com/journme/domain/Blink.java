@@ -28,6 +28,7 @@ public class Blink extends BaseEntity {
 
     private Integer ratio = 48;
 
+    //TODO: render states from DB into HTML as Angular module configuration
     @DBRef
     private List<State> states = new ArrayList<>();
 
