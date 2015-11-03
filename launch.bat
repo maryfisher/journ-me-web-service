@@ -1,0 +1,1 @@
+mvn package && java -jar journ-me-rest-service/target/journ-me-rest-service-0.0.1-SNAPSHOT.jar --spring.config.location=file:../app.properties
