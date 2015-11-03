@@ -5,7 +5,9 @@ import com.journme.rest.state.repository.StateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import java.util.List;
@@ -15,6 +17,8 @@ import java.util.List;
  * @version 1.0
  * @since 28.10.2015
  */
+@Component
+@Singleton
 public class StateResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateResource.class);
@@ -25,7 +29,7 @@ public class StateResource {
     @GET
     @Path("/")
     public List<State> retrieveState() {
-        LOGGER.info("Incoming request to retrieve all states");
+        LOGGER.debug("Incoming request to retrieve all states");
         return stateRepository.findAll();
     }
 }

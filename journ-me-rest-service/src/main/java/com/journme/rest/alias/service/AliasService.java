@@ -2,8 +2,10 @@ package com.journme.rest.alias.service;
 
 import com.journme.domain.AliasBase;
 import com.journme.domain.AliasDetail;
+import com.journme.domain.AliasImage;
 import com.journme.rest.alias.repository.AliasBaseRepository;
 import com.journme.rest.alias.repository.AliasDetailRepository;
+import com.journme.rest.alias.repository.AliasImageRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.contract.JournMeExceptionDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,19 @@ public class AliasService {
     @Autowired
     private AliasBaseRepository aliasBaseRepository;
 
+    @Autowired
+    private AliasImageRepository aliasImageRepository;
+
     public AliasBase save(AliasBase alias) {
         return aliasBaseRepository.save(alias);
     }
 
     public AliasDetail save(AliasDetail alias) {
         return aliasDetailRepository.save(alias);
+    }
+
+    public AliasImage save(AliasImage aliasImage) {
+        return aliasImageRepository.save(aliasImage);
     }
 
     public AliasDetail getAliasDetail(String aliasId) {
@@ -47,6 +56,10 @@ public class AliasService {
         }
 
         return alias;
+    }
+
+    public AliasImage getImage(String aliasImageId) {
+        return aliasImageRepository.findOne(aliasImageId);
     }
 
     private void throwAliasExc(String aliasId) {

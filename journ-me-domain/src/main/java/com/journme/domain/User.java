@@ -22,10 +22,10 @@ public class User extends BaseEntity {
     @Indexed
     private String email;
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<AliasBase> aliases = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private AliasBase currentAlias;
 
     @JsonIgnore

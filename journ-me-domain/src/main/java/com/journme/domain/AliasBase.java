@@ -1,5 +1,7 @@
 package com.journme.domain;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,9 +12,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "alias")
 public class AliasBase extends BaseEntity {
 
+    @NotBlank
     private String name;
 
-    private String image;
+    @DBRef(lazy = true)
+    private AliasImage image;
 
     public String getName() {
         return name;
@@ -22,11 +26,11 @@ public class AliasBase extends BaseEntity {
         this.name = name;
     }
 
-    public String getImage() {
+    public AliasImage getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(AliasImage image) {
         this.image = image;
     }
 

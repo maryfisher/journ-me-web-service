@@ -1,10 +1,7 @@
 package com.journme.rest.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.journme.domain.BaseEntity;
 import com.journme.rest.RootResource;
@@ -13,6 +10,7 @@ import com.journme.rest.common.filter.AuthTokenFilter;
 import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -29,6 +27,7 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
  * @since 15.10.2015
  */
 @Configuration
+@ApplicationPath("/api") //Restrict Jersey to /api endpoints to allow Spring Boot to serve static content
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {
@@ -57,6 +56,7 @@ public class JerseyConfig extends ResourceConfig {
         public CustomObjectMapperProvider() {
             defaultObjectMapper = new ObjectMapper();
             defaultObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             final SimpleModule module = new SimpleModule("MongoDBRefSerializer");
             module.addSerializer(Proxy.class, new JsonSerializer<Proxy>() {

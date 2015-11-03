@@ -13,9 +13,10 @@ public class MomentBase extends BaseEntity {
 
     private Boolean isPublic;
 
-    @DBRef
+    @DBRef(lazy = true)
     private AliasBase alias;
-    @DBRef
+
+    @DBRef(lazy = true)
     private JourneyBase journey;
 
     public Boolean getIsPublic() {

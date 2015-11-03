@@ -25,7 +25,7 @@ public abstract class BaseEntity {
     private Long version;
 
     @CreatedDate
-    private Date createdAt;
+    private Date created;
 
     @LastModifiedDate
     private Date lastModified;
@@ -46,12 +46,12 @@ public abstract class BaseEntity {
         this.version = version;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreated() {
+        return created;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreated(Date created) {
+        this.created = created;
     }
 
     public Date getLastModified() {
@@ -82,5 +82,54 @@ public abstract class BaseEntity {
             this.id = other.id;
         }
         return this;
+    }
+
+    public static abstract class BaseImageEntity extends BaseEntity {
+
+        private byte[] image;
+        private byte[] thumbnail;
+        private String name;
+        private String mediaType;
+
+        public BaseImageEntity() {
+        }
+
+        public BaseImageEntity(String name, String mediaType, byte[] image) {
+            this.name = name;
+            this.mediaType = mediaType;
+            this.image = image;
+        }
+
+        public byte[] getImage() {
+            return image;
+        }
+
+        public void setImage(byte[] image) {
+            this.image = image;
+        }
+
+        public byte[] getThumbnail() {
+            return thumbnail;
+        }
+
+        public void setThumbnail(byte[] thumbnail) {
+            this.thumbnail = thumbnail;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getMediaType() {
+            return mediaType;
+        }
+
+        public void setMediaType(String mediaType) {
+            this.mediaType = mediaType;
+        }
     }
 }

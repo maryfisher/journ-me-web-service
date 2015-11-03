@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -24,11 +25,12 @@ public class JourneyBase extends BaseEntity {
     @NotBlank
     private String name;
 
-    private String description;
+    private String descript;
 
     @DBRef
     private AliasBase alias;
 
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
     private JoinType join = JoinType.NONE;
 
     private Boolean isPublic = Boolean.TRUE;
@@ -41,12 +43,12 @@ public class JourneyBase extends BaseEntity {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescript() {
+        return descript;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescript(String descript) {
+        this.descript = descript;
     }
 
     public AliasBase getAlias() {
@@ -77,8 +79,8 @@ public class JourneyBase extends BaseEntity {
         if (other.name != null) {
             this.name = other.name;
         }
-        if (other.description != null) {
-            this.description = other.description;
+        if (other.descript != null) {
+            this.descript = other.descript;
         }
         if (other.alias != null) {
             this.alias = other.alias;
