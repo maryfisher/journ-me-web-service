@@ -10,6 +10,7 @@ import com.journme.rest.common.filter.AuthTokenFilter;
 import java.io.IOException;
 import java.lang.reflect.Proxy;
 import java.util.List;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -26,6 +27,7 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
  * @since 15.10.2015
  */
 @Configuration
+@ApplicationPath("/api") //Restrict Jersey to /api endpoints to allow Spring Boot to serve static content
 public class JerseyConfig extends ResourceConfig {
 
     public JerseyConfig() {

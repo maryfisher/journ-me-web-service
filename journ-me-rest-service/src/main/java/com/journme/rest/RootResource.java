@@ -29,7 +29,7 @@ import javax.ws.rs.Produces;
  */
 @Component
 @Singleton
-@Path("/api")
+@Path("/") //JerseyConfig already defines "/api" as endpoint start
 @Consumes(MediaType.APPLICATION_JSON_VALUE)
 @Produces(MediaType.APPLICATION_JSON_VALUE)
 public class RootResource {

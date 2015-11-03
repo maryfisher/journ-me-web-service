@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <h1>POJO for REST serialisation</h1>
@@ -22,17 +23,18 @@ public class LoginResponse {
 
     private String email;
 
-    private List<AliasBase> aliases = new ArrayList<>();
+    private List<String> aliases = new ArrayList<>();
 
-    private AliasBase currentAlias;
+    private String currentAlias;
 
     private Map<String, Object> headerItems;
 
     public LoginResponse(User user) {
         headerItems = new HashMap<>();
         email = user.getEmail();
-        aliases = user.getAliases();
-        currentAlias = user.getCurrentAlias();
+        aliases = new ArrayList<>(user.getAliases().size());
+        aliases.addAll(user.getAliases().stream().map(AliasBase::getId).collect(Collectors.toList()));
+        currentAlias = user.getCurrentAlias().getId();
     }
 
     public Map<String, Object> getHeaderItems() {
@@ -55,19 +57,19 @@ public class LoginResponse {
         this.email = email;
     }
 
-    public List<AliasBase> getAliases() {
+    public List<String> getAliases() {
         return aliases;
     }
 
-    public void setAliases(List<AliasBase> aliases) {
+    public void setAliases(List<String> aliases) {
         this.aliases = aliases;
     }
 
-    public AliasBase getCurrentAlias() {
+    public String getCurrentAlias() {
         return currentAlias;
     }
 
-    public void setCurrentAlias(AliasBase currentAlias) {
+    public void setCurrentAlias(String currentAlias) {
         this.currentAlias = currentAlias;
     }
 }
