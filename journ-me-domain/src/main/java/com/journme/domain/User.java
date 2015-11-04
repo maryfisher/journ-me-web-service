@@ -17,7 +17,7 @@ import java.util.List;
  * @since 22.10.2015
  */
 @Document(collection = "user")
-public class User extends BaseEntity {
+public class User extends AbstractEntity {
 
     @Indexed
     private String email;
@@ -35,7 +35,7 @@ public class User extends BaseEntity {
     private byte[] passwordHashSalt;
 
     @JsonIgnore
-    private int passwordHashIterations;
+    private Integer passwordHashIterations;
 
     public String getEmail() {
         return email;
@@ -77,11 +77,11 @@ public class User extends BaseEntity {
         this.passwordHashSalt = passwordHashSalt;
     }
 
-    public int getPasswordHashIterations() {
+    public Integer getPasswordHashIterations() {
         return passwordHashIterations;
     }
 
-    public void setPasswordHashIterations(int passwordHashIterations) {
+    public void setPasswordHashIterations(Integer passwordHashIterations) {
         this.passwordHashIterations = passwordHashIterations;
     }
 }

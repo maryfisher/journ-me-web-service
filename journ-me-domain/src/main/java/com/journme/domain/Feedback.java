@@ -12,7 +12,7 @@ import java.util.List;
  * @since 28.10.2015
  */
 @Document(collection = "feedback")
-public class Feedback extends BaseEntity {
+public class Feedback extends AbstractEntity {
 
     @DBRef
     private AliasBase alias;

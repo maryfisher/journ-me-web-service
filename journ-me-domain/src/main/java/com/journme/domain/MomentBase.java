@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @since 22.10.2015
  */
 @Document(collection = "moment")
-public class MomentBase extends BaseEntity {
+public class MomentBase extends AbstractEntity {
 
     private Boolean isPublic;
 
@@ -50,7 +50,7 @@ public class MomentBase extends BaseEntity {
     }
 
     @Override
-    public MomentBase clone(BaseEntity other) {
+    public MomentBase clone(AbstractEntity other) {
         super.clone(other);
         copy((MomentBase) other);
         return this;

@@ -3,7 +3,7 @@ package com.journme.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "blinkImage")
-public class BlinkImage extends BaseEntity.BaseImageEntity {
+public class BlinkImage extends AbstractEntity.AbstractImageEntity {
 
     public BlinkImage() {
     }
