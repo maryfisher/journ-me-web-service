@@ -71,7 +71,7 @@ public class AliasResource extends AbstractResource {
         }
 
         existingAlias.copy(changedAlias);
-        return aliasService.save(changedAlias);
+        return aliasService.save(existingAlias);
     }
 
     @GET

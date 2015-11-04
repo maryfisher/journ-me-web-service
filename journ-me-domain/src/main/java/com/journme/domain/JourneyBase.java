@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @since 20.10.2015
  */
 @Document(collection = "journey")
-public class JourneyBase extends BaseEntity {
+public class JourneyBase extends AbstractEntity {
 
     public enum JoinType {
         ALL,
@@ -94,7 +94,7 @@ public class JourneyBase extends BaseEntity {
     }
 
     @Override
-    public JourneyBase clone(BaseEntity other) {
+    public JourneyBase clone(AbstractEntity other) {
         super.clone(other);
         copy((JourneyBase) other);
         return this;

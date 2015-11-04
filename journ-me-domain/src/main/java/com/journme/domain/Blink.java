@@ -12,7 +12,7 @@ import java.util.List;
  * @since 28.10.2015
  */
 @Document(collection = "blink")
-public class Blink extends BaseEntity {
+public class Blink extends AbstractEntity {
 
     private Integer format = 0;
 

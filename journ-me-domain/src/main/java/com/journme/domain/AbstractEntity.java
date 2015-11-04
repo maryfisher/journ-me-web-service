@@ -15,7 +15,7 @@ import java.util.Date;
  * @version 1.0
  * @since 24.10.2015
  */
-public abstract class BaseEntity {
+public abstract class AbstractEntity {
 
     @Id
     private String id;
@@ -69,7 +69,7 @@ public abstract class BaseEntity {
     @Override
     public boolean equals(Object other) {
         // A new entity not yet saved against the DB cannot equal another entity
-        return this == other || id != null && other instanceof BaseEntity && id.equals(((BaseEntity) other).getId());
+        return this == other || id != null && other instanceof AbstractEntity && id.equals(((AbstractEntity) other).getId());
     }
 
     @Override
@@ -77,24 +77,33 @@ public abstract class BaseEntity {
         return id != null ? id.hashCode() : 0;
     }
 
-    public BaseEntity clone(BaseEntity other) {
+    public AbstractEntity clone(AbstractEntity other) {
         if (other.id != null) {
             this.id = other.id;
+        }
+        if (other.version != null) {
+            this.version = other.version;
+        }
+        if (other.created != null) {
+            this.created = other.created;
+        }
+        if (other.lastModified != null) {
+            this.lastModified = other.lastModified;
         }
         return this;
     }
 
-    public static abstract class BaseImageEntity extends BaseEntity {
+    public static abstract class AbstractImageEntity extends AbstractEntity {
 
         private byte[] image;
         private byte[] thumbnail;
         private String name;
         private String mediaType;
 
-        public BaseImageEntity() {
+        public AbstractImageEntity() {
         }
 
-        public BaseImageEntity(String name, String mediaType, byte[] image) {
+        public AbstractImageEntity(String name, String mediaType, byte[] image) {
             this.name = name;
             this.mediaType = mediaType;
             this.image = image;
