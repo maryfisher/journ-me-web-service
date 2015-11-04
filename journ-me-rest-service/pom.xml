@@ -13,6 +13,10 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <tomcat.version>8.0.28</tomcat.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.journme</groupId>
