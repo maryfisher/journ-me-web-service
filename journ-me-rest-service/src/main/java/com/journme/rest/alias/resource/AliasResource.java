@@ -17,8 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -51,15 +49,20 @@ public class AliasResource extends AbstractResource {
     public AliasBase updateAlias(
             @NotBlank @PathParam("aliasId") String aliasId,
             @FormDataParam("file") FormDataBodyPart imagePart,
-            @NotNull @Valid @FormDataParam("alias") AliasBase changedAlias) throws IOException {
+            @FormDataParam("alias") FormDataBodyPart aliasPart) throws IOException {
         LOGGER.info("Incoming request to update alias {}", aliasId);
         AliasBase existingAlias = assertAliasInContext(aliasId);
+
+        aliasPart.setMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE);
+        AliasBase changedAlias = aliasPart.getValueAs(AliasBase.class);
 
         byte[] image = toByteArray(imagePart);
         if (image != null && image.length > 0) {
             String imageName = imagePart.getContentDisposition().getFileName();
             String mimeType = imagePart.getMediaType().toString();
             AliasImage aliasImage = existingAlias.getImage() != null ? existingAlias.getImage() : new AliasImage();
+            //FIXME: this is a Proxy and a Proxy does not set name,image,ect,
+            // could be related to Exception at save that complains about duplicate ID
             aliasImage.setName(imageName);
             aliasImage.setMediaType(mimeType);
             aliasImage.setImage(image);

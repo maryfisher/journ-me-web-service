@@ -21,8 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -61,8 +59,11 @@ public class BlinkResource extends AbstractResource {
     public Blink createBlink(
             @NotBlank @QueryParam("momentId") String momentId,
             @FormDataParam("file") List<FormDataBodyPart> imageParts,
-            @NotNull @Valid @FormDataParam("blink") Blink blink) throws IOException {
+            @FormDataParam("blink") FormDataBodyPart blinkPart) throws IOException {
         LOGGER.info("Incoming request to create a new blink under moment {}", momentId);
+
+        blinkPart.setMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE);
+        Blink blink = blinkPart.getValueAs(Blink.class);
 
         MomentDetail moment = momentService.getMomentDetail(momentId);
         assertAliasInContext(moment.getAlias().getId());
@@ -99,8 +100,12 @@ public class BlinkResource extends AbstractResource {
     @ProtectedByAuthToken
     public Blink updateBlink(
             @NotBlank @PathParam("blinkId") String blinkId,
-            @NotNull @Valid Blink changedBlink) {
+            @FormDataParam("file") List<FormDataBodyPart> imageParts,
+            @FormDataParam("blink") FormDataBodyPart blinkPart) throws IOException {
         LOGGER.info("Incoming request to update blink {}", blinkId);
+        blinkPart.setMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE);
+        Blink changedBlink = blinkPart.getValueAs(Blink.class);
+
         Blink existingBlink = blinkRepository.findOne(blinkId);
         if (existingBlink == null) {
             throw new JournMeException("No Blink found for given ID " + blinkId,

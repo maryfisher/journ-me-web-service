@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.journme.domain.AbstractEntity;
+import com.journme.domain.AbstractEntity.AbstractImageEntity;
 import com.journme.rest.RootResource;
 import com.journme.rest.common.errorhandling.JerseyExceptionMapper;
 import com.journme.rest.common.filter.AuthTokenFilter;
@@ -75,6 +76,12 @@ public class JerseyConfig extends ResourceConfig {
                 @Override
                 public void serialize(LazyLoadingProxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                     jgen.writeString(value.toDBRef().getId().toString());
+                }
+            });
+            module.addSerializer(AbstractImageEntity.class, new JsonSerializer<AbstractImageEntity>() {
+                @Override
+                public void serialize(AbstractImageEntity value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+                    jgen.writeString(value.getId());
                 }
             });
             defaultObjectMapper.registerModule(module);
