@@ -20,6 +20,13 @@
         <module>journ-me-domain</module>
     </modules>
 
+    <properties>
+        <!-- Version overwrites -->
+        <tomcat.version>8.0.28</tomcat.version>
+        <spring-data-releasetrain.version>Fowler-SR2</spring-data-releasetrain.version>
+        <mongodb.version>3.1.0</mongodb.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

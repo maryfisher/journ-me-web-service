@@ -10,7 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableWebMvc
 public class StaticResourceConfig extends WebMvcConfigurerAdapter {
 
-    @Value("${staticResource.locations:file:///D:/Bitbucket/journ-me-client-app/.temp/,file:///D:/Bitbucket/journ-me-client-app/lib/}")
+    @Value("${staticResource.locations:}")
     private String[] locations;
 
     @Value("${staticResource.cachePeriod:3600}")
@@ -23,6 +23,6 @@ public class StaticResourceConfig extends WebMvcConfigurerAdapter {
                     .addResourceLocations(locations)
                     .setCachePeriod(cachePeriod);
         }
- }
+    }
 
 }
