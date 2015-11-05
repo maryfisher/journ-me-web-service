@@ -181,8 +181,9 @@ public class JourneyResource extends AbstractResource {
         LOGGER.info("Incoming request to accept joining journey {} with alias {}", journeyId, aliasId);
 
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
-        AliasBase aliasBase = assertAliasInContext(journey.getAlias().getId());
+        assertAliasInContext(journey.getAlias().getId());
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
+        AliasBase aliasBase = new AliasBase().clone(aliasDetail);
 
         journey.getJoinRequests().remove(aliasBase);
         journey.getJoinedAliases().add(aliasBase);
@@ -200,9 +201,9 @@ public class JourneyResource extends AbstractResource {
             @NotBlank @PathParam("aliasId") String aliasId) {
         LOGGER.info("Incoming request to unjoin journey {} with alias {}", journeyId, aliasId);
 
-        assertAliasInContext(aliasId);
-        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        assertAliasInContext(aliasId, journey.getAlias().getId());
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
 
         journey.getJoinedAliases().remove(aliasDetail);
         journey = journeyService.save(journey);

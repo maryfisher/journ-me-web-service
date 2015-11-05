@@ -43,11 +43,4 @@ public abstract class AbstractAlias extends AbstractEntity {
         }
     }
 
-    @Override
-    public AbstractAlias clone(AbstractEntity other) {
-        super.clone(other);
-        copy((AbstractAlias) other);
-        return this;
-    }
-
 }

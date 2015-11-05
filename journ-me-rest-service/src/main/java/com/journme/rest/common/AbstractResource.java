@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,15 +36,19 @@ public abstract class AbstractResource {
         return ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser();
     }
 
-    protected AliasBase assertAliasInContext(String theAliasId) {
+    protected AliasBase assertAliasInContext(String... aliasIds) {
         List<AliasBase> userAliases = ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser().getAliases();
 
-        for (AliasBase userAlias : userAliases) {
-            if (userAlias.equalsId(theAliasId)) {
-                return userAlias;
+        for (String aliasId : aliasIds) {
+            for (AliasBase userAlias : userAliases) {
+                if (userAlias.equalsId(aliasId)) {
+                    return userAlias;
+                }
             }
         }
-        throw new JournMeException("No Alias found for given alias ID " + theAliasId,
+
+        throw new JournMeException("User does not own alias with any of the alias IDs "
+                + String.join(",", Arrays.asList(aliasIds)),
                 Response.Status.BAD_REQUEST,
                 JournMeExceptionDto.ExceptionCode.ALIAS_NONEXISTENT);
     }
