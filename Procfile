@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -jar  journ-me-rest-service/target/journ-me-rest-service-0.0.1-SNAPSHOT.jar
