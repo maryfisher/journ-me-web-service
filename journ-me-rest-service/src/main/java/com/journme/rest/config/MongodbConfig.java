@@ -5,6 +5,8 @@ import com.journme.domain.AliasBase;
 import com.journme.domain.AliasDetail;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +17,9 @@ import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.util.StringUtils;
 
-import java.util.Collections;
+import static java.util.Collections.singletonList;
 
 /**
  * <h1>MongoDB configuration</h1>
@@ -40,14 +43,28 @@ public class MongodbConfig extends AbstractMongoConfiguration {
     @Value("${mongodb.name:journmedb}")
     private String mongodbName;
 
+    @Value("${mongodb.username:}")
+    private String mongodbUsername;
+
+    @Value("${mongodb.password:}")
+    private String mongodbPassword;
+
     @Override
     protected String getDatabaseName() {
         return mongodbName;
     }
 
     @Override
+    @Bean
     public Mongo mongo() throws Exception {
-        return new MongoClient(mongodbHost, mongodbPort);
+        ServerAddress address = new ServerAddress(mongodbHost, mongodbPort);
+        MongoCredential credential = StringUtils.isEmpty(mongodbUsername) ? null :
+                MongoCredential.createCredential(mongodbUsername, getDatabaseName(), mongodbPassword.toCharArray());
+        if (credential != null) {
+            return new MongoClient(singletonList(address), singletonList(credential));
+        } else {
+            return new MongoClient(singletonList(address));
+        }
     }
 
     @Override
@@ -67,7 +84,7 @@ public class MongodbConfig extends AbstractMongoConfiguration {
     @Bean
     @Override
     public CustomConversions customConversions() {
-        return new CustomConversions(Collections.singletonList(new AliasConverter()));
+        return new CustomConversions(singletonList(new AliasConverter()));
     }
 
     private class AliasConverter implements Converter<AliasDetail, AliasBase> {
