@@ -4,8 +4,8 @@ import com.journme.domain.AliasBase;
 import com.journme.domain.AliasDetail;
 import com.journme.domain.AliasImage;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.ImageResource;
 import com.journme.rest.contract.ImageClassifier;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -28,7 +28,7 @@ import java.io.IOException;
  */
 @Component
 @Singleton
-public class AliasResource extends AbstractResource {
+public class AliasResource extends ImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AliasResource.class);
 
@@ -84,16 +84,6 @@ public class AliasResource extends AbstractResource {
             @PathParam("imageClassifier") ImageClassifier imageClassifier) {
         LOGGER.info("Incoming request to retrieve alias image {}", aliasImageId);
         AliasImage image = aliasService.getImage(aliasImageId);
-        if (image != null) {
-            byte[] imageData = (imageClassifier == ImageClassifier.thumbnail && image.getThumbnail() != null) ?
-                    image.getThumbnail() : image.getImage();
-            return Response.
-                    status(Response.Status.OK).
-                    entity(imageData).
-                    type(image.getMediaType()).
-                    build();
-        } else {
-            return Response.noContent().build();
-        }
+        return sendImageResponse(image, imageClassifier);
     }
 }

@@ -4,9 +4,10 @@ import com.journme.domain.Blink;
 import com.journme.domain.BlinkImage;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
-import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.ImageResource;
+import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.BlinkImageRepository;
 import com.journme.rest.moment.repository.BlinkRepository;
@@ -33,7 +34,7 @@ import java.util.List;
  */
 @Component
 @Singleton
-public class BlinkResource extends AbstractResource {
+public class BlinkResource extends ImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlinkResource.class);
 
@@ -119,5 +120,15 @@ public class BlinkResource extends AbstractResource {
         existingBlink.copy(changedBlink);
         return blinkRepository.save(existingBlink);
 
+    }
+
+    @GET
+    @Path("/image/{blinkImageId}/{imageClassifier}")
+    public Response retrieveImage(
+            @NotBlank @PathParam("blinkImageId") String blinkImageId,
+            @PathParam("imageClassifier") ImageClassifier imageClassifier) {
+        LOGGER.info("Incoming request to retrieve blink image {}", blinkImageId);
+        BlinkImage image = blinkImageRepository.findOne(blinkImageId);
+        return sendImageResponse(image, imageClassifier);
     }
 }

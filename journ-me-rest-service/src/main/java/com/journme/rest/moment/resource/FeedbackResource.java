@@ -5,7 +5,7 @@ import com.journme.domain.Feedback;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.moment.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;

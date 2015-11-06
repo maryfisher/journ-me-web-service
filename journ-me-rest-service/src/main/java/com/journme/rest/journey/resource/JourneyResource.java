@@ -5,7 +5,7 @@ import com.journme.domain.AliasDetail;
 import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;

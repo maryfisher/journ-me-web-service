@@ -1,4 +1,4 @@
-package com.journme.rest.common;
+package com.journme.rest.common.resource;
 
 import com.journme.domain.AliasBase;
 import com.journme.domain.User;

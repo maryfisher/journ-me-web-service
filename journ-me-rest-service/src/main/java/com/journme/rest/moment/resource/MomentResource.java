@@ -2,7 +2,7 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.*;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.contract.JournMeExceptionDto;
