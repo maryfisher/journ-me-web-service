@@ -75,7 +75,7 @@ public class JourneyBase extends AbstractEntity {
         this.isPublic = isPublic;
     }
 
-    public void copy(JourneyBase other) {
+    public JourneyBase copy(JourneyBase other) {
         if (other.name != null) {
             this.name = other.name;
         }
@@ -91,6 +91,7 @@ public class JourneyBase extends AbstractEntity {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
+        return this;
     }
 
     @Override

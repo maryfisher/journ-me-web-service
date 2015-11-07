@@ -3,8 +3,9 @@ package com.journme.rest.config;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.journme.domain.AbstractEntity;
-import com.journme.domain.AbstractEntity.AbstractImageEntity;
 import com.journme.rest.RootResource;
 import com.journme.rest.common.errorhandling.JerseyExceptionMapper;
 import com.journme.rest.common.filter.AuthTokenFilter;
@@ -61,7 +62,7 @@ public class JerseyConfig extends ResourceConfig {
             defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             final SimpleModule module = new SimpleModule("MongoDBRefSerializer");
-            module.addSerializer(Proxy.class, new JsonSerializer<Proxy>() {
+            module.addSerializer(Proxy.class, new StdSerializer<Proxy>(Proxy.class) {
                 @Override
                 public void serialize(Proxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                     List<AbstractEntity> proxyList = (List<AbstractEntity>) value;
@@ -72,16 +73,19 @@ public class JerseyConfig extends ResourceConfig {
                     jgen.writeEndArray();
                 }
             });
-            module.addSerializer(LazyLoadingProxy.class, new JsonSerializer<LazyLoadingProxy>() {
+            module.addSerializer(LazyLoadingProxy.class, new StdSerializer<LazyLoadingProxy>(LazyLoadingProxy.class) {
                 @Override
                 public void serialize(LazyLoadingProxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                     jgen.writeString(value.toDBRef().getId().toString());
                 }
             });
-            module.addSerializer(AbstractImageEntity.class, new JsonSerializer<AbstractImageEntity>() {
+            module.setSerializerModifier(new BeanSerializerModifier() {
                 @Override
-                public void serialize(AbstractImageEntity value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-                    jgen.writeString(value.getId());
+                public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                    if (AbstractEntity.class.isAssignableFrom(beanDesc.getBeanClass())) {
+                        return new EntitySerializer((JsonSerializer<Object>) serializer);
+                    }
+                    return serializer;
                 }
             });
             defaultObjectMapper.registerModule(module);
@@ -90,6 +94,25 @@ public class JerseyConfig extends ResourceConfig {
         @Override
         public ObjectMapper getContext(Class<?> type) {
             return defaultObjectMapper;
+        }
+    }
+
+    private static class EntitySerializer extends JsonSerializer<AbstractEntity> {
+
+        private final JsonSerializer<Object> defaultSerializer;
+
+        public EntitySerializer(JsonSerializer<Object> defaultSerializer) {
+            this.defaultSerializer = defaultSerializer;
+        }
+
+        @Override
+        public void serialize(AbstractEntity entity, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+            if (entity.jsonIdOnly) {
+                jgen.writeString(entity.getId());
+            } else {
+                // Else use the default serializer to write out the whole entity as JSON
+                defaultSerializer.serialize(entity, jgen, provider);
+            }
         }
     }
 

@@ -34,13 +34,14 @@ public abstract class AbstractAlias extends AbstractEntity {
         this.image = image;
     }
 
-    public void copy(AbstractAlias other) {
+    public AbstractAlias copy(AbstractAlias other) {
         if (other.name != null) {
             this.name = other.name;
         }
         if (other.image != null) {
             this.image = other.image;
         }
+        return this;
     }
 
 }

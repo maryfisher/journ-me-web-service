@@ -2,9 +2,9 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.*;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.service.JourneyService;
 import com.journme.rest.moment.service.MomentService;
@@ -56,6 +56,7 @@ public class MomentResource extends AbstractResource {
         LOGGER.info("Incoming request to create a new moment under journy {} for alias {}", journeyId, aliasId);
 
         AliasBase aliasBase = assertAliasInContext(aliasId);
+        aliasBase.jsonIdOnly = true;
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
         if (journey.getAlias().equals(aliasBase) || journey.getJoinedAliases().contains(aliasBase)) {
             moment.setJourney(new JourneyBase().clone(journey));

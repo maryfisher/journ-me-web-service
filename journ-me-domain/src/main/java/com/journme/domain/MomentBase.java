@@ -43,10 +43,17 @@ public class MomentBase extends AbstractEntity {
         this.journey = journey;
     }
 
-    public void copy(MomentBase other) {
+    public MomentBase copy(MomentBase other) {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
+        if (other.alias != null) {
+            this.alias = other.alias;
+        }
+        if (other.journey != null) {
+            this.journey = other.journey;
+        }
+        return this;
     }
 
     @Override

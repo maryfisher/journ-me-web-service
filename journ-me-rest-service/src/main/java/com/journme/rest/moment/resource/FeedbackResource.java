@@ -5,8 +5,8 @@ import com.journme.domain.Feedback;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.moment.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.hibernate.validator.constraints.NotBlank;
@@ -54,7 +54,7 @@ public class FeedbackResource extends AbstractResource {
 
         feedback.setAlias(alias);
         feedback.setMoment(new MomentBase().clone(moment));
-        feedback.setId(null); //ensures that new Moment is created in the collection
+        feedback.setId(null); //ensures that new Feedback is created in the collection
         feedback = feedbackRepository.save(feedback);
 
         moment.getFeedback().add(feedback);

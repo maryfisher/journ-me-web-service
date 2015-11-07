@@ -6,7 +6,7 @@ import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
-import com.journme.rest.common.resource.ImageResource;
+import com.journme.rest.common.resource.AbstractResource.AbstractImageResource;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.BlinkImageRepository;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @Component
 @Singleton
-public class BlinkResource extends ImageResource {
+public class BlinkResource extends AbstractImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlinkResource.class);
 
@@ -123,12 +123,18 @@ public class BlinkResource extends ImageResource {
     }
 
     @GET
-    @Path("/image/{blinkImageId}/{imageClassifier}")
-    public Response retrieveImage(
+    @Path("/image/{blinkImageId}/{imageClassifier:\\w*}")
+    public Response retrieveImageWithClassifier(
             @NotBlank @PathParam("blinkImageId") String blinkImageId,
-            @PathParam("imageClassifier") ImageClassifier imageClassifier) {
-        LOGGER.info("Incoming request to retrieve blink image {}", blinkImageId);
+            @DefaultValue("original") @PathParam("imageClassifier") ImageClassifier imageClassifier) {
+        LOGGER.info("Incoming request to retrieve {} blink image {}", imageClassifier, blinkImageId);
         BlinkImage image = blinkImageRepository.findOne(blinkImageId);
         return sendImageResponse(image, imageClassifier);
+    }
+
+    @GET
+    @Path("/image/{blinkImageId}")
+    public Response retrieveImage(@NotBlank @PathParam("blinkImageId") String blinkImageId) {
+        return retrieveImageWithClassifier(blinkImageId, ImageClassifier.original);
     }
 }

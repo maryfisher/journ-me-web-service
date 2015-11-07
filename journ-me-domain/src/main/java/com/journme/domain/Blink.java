@@ -88,7 +88,29 @@ public class Blink extends AbstractEntity {
         this.states = states;
     }
 
-    public void copy(Blink other) {
-        //TODO
+    public Blink copy(Blink other) {
+        if (other.format != null) {
+            this.format = other.format;
+        }
+        if (other.images != null) {
+            this.images = other.images;
+        }
+        if (other.texts != null) {
+            this.texts = other.texts;
+        }
+        if (other.index != null) {
+            this.index = other.index;
+        }
+        if (other.moment != null) {
+            this.moment = other.moment;
+        }
+        if (other.ratio != null) {
+            this.ratio = other.ratio;
+        }
+        if (other.states != null) {
+            this.states = other.states;
+        }
+
+        return this;
     }
 }

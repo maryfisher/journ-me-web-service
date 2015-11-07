@@ -1,9 +1,11 @@
 package com.journme.rest.common.resource;
 
+import com.journme.domain.AbstractEntity;
 import com.journme.domain.AliasBase;
 import com.journme.domain.User;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.AuthTokenFilter;
+import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -55,6 +57,23 @@ public abstract class AbstractResource {
 
     protected byte[] toByteArray(FormDataBodyPart imagePart) throws IOException {
         return imagePart != null ? IOUtils.toByteArray(imagePart.getValueAs(InputStream.class)) : null;
+    }
+
+    public static abstract class AbstractImageResource extends AbstractResource {
+
+        protected Response sendImageResponse(AbstractEntity.AbstractImageEntity image, ImageClassifier imageClassifier) {
+            if (image != null) {
+                byte[] imageData = (imageClassifier == ImageClassifier.thumbnail && image.getThumbnail() != null) ?
+                        image.getThumbnail() : image.getImage();
+                return Response.
+                        status(Response.Status.OK).
+                        entity(imageData).
+                        type(image.getMediaType()).
+                        build();
+            } else {
+                return Response.noContent().build();
+            }
+        }
     }
 
 }
