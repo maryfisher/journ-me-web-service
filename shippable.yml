@@ -4,4 +4,9 @@ jdk:
    - oraclejdk8
 
 after_success:
-   - if [ "$BRANCH" == "develop" ]; then git push -f git@heroku.com:journ-me.git develop:master; fi
+   - git submodule init
+   - git submodule update --remote
+   - git commit -a -m "Updating submodule reference to latest commit"
+   - git status
+   - git log -2
+   - if [ "$BRANCH" == "develop" ]; then git push -f git@heroku.com:journ-me-test01.git HEAD:master; fi
