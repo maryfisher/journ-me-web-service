@@ -1,11 +1,9 @@
 package com.journme.rest.config;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.journme.domain.AbstractEntity;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.journme.rest.RootResource;
 import com.journme.rest.common.errorhandling.JerseyExceptionMapper;
 import com.journme.rest.common.filter.AuthTokenFilter;
@@ -13,14 +11,10 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.lang.reflect.Proxy;
-import java.util.List;
 
 /**
  * <h1>Jersey configuration</h1> This class contains all Jersey REST related configurations
@@ -60,59 +54,12 @@ public class JerseyConfig extends ResourceConfig {
             defaultObjectMapper = new ObjectMapper();
             defaultObjectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             defaultObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-            final SimpleModule module = new SimpleModule("MongoDBRefSerializer");
-            module.addSerializer(Proxy.class, new StdSerializer<Proxy>(Proxy.class) {
-                @Override
-                public void serialize(Proxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-                    List<AbstractEntity> proxyList = (List<AbstractEntity>) value;
-                    jgen.writeStartArray();
-                    for (AbstractEntity proxy : proxyList) {
-                        jgen.writeString(proxy.getId());
-                    }
-                    jgen.writeEndArray();
-                }
-            });
-            module.addSerializer(LazyLoadingProxy.class, new StdSerializer<LazyLoadingProxy>(LazyLoadingProxy.class) {
-                @Override
-                public void serialize(LazyLoadingProxy value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-                    jgen.writeString(value.toDBRef().getId().toString());
-                }
-            });
-            module.setSerializerModifier(new BeanSerializerModifier() {
-                @Override
-                public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                    if (AbstractEntity.class.isAssignableFrom(beanDesc.getBeanClass())) {
-                        return new EntitySerializer((JsonSerializer<Object>) serializer);
-                    }
-                    return serializer;
-                }
-            });
-            defaultObjectMapper.registerModule(module);
+            defaultObjectMapper.configure(MapperFeature.USE_STATIC_TYPING, true);
         }
 
         @Override
         public ObjectMapper getContext(Class<?> type) {
             return defaultObjectMapper;
-        }
-    }
-
-    private static class EntitySerializer extends JsonSerializer<AbstractEntity> {
-
-        private final JsonSerializer<Object> defaultSerializer;
-
-        public EntitySerializer(JsonSerializer<Object> defaultSerializer) {
-            this.defaultSerializer = defaultSerializer;
-        }
-
-        @Override
-        public void serialize(AbstractEntity entity, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-            if (entity.jsonIdOnly) {
-                jgen.writeString(entity.getId());
-            } else {
-                // Else use the default serializer to write out the whole entity as JSON
-                defaultSerializer.serialize(entity, jgen, provider);
-            }
         }
     }
 

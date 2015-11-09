@@ -1,5 +1,9 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.journme.domain.converter.EntityToIdSerializer;
+import com.journme.domain.converter.NullDeserializer;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -16,14 +20,18 @@ public class Blink extends AbstractEntity {
 
     private Integer format = 0;
 
-    @DBRef(lazy = true)
+    @DBRef
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private List<BlinkImage> images = new ArrayList<>();
 
     private List<String> texts = new ArrayList<>();
 
     private Integer index;
 
-    @DBRef(lazy = true)
+    @DBRef
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private MomentBase moment;
 
     private Integer ratio = 48;

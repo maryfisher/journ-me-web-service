@@ -17,9 +17,6 @@ import java.util.Date;
  */
 public abstract class AbstractEntity {
 
-    @JsonIgnore
-    public transient boolean jsonIdOnly = false;
-
     @Id
     private String id;
 
@@ -81,7 +78,6 @@ public abstract class AbstractEntity {
     }
 
     public AbstractEntity clone(AbstractEntity other) {
-        this.jsonIdOnly = other.jsonIdOnly;
         if (other.id != null) {
             this.id = other.id;
         }
@@ -105,7 +101,6 @@ public abstract class AbstractEntity {
         private String mediaType;
 
         public AbstractImageEntity() {
-            this.jsonIdOnly = true;
         }
 
         public AbstractImageEntity(String name, String mediaType, byte[] image) {

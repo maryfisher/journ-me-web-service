@@ -1,5 +1,9 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.journme.domain.converter.EntityToIdSerializer;
+import com.journme.domain.converter.NullDeserializer;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,10 +17,14 @@ public class MomentBase extends AbstractEntity {
 
     private Boolean isPublic;
 
-    @DBRef(lazy = true)
+    @DBRef
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private AliasBase alias;
 
-    @DBRef(lazy = true)
+    @DBRef
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private JourneyBase journey;
 
     public Boolean getIsPublic() {

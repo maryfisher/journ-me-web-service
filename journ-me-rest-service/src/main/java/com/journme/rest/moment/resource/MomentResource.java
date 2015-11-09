@@ -56,7 +56,6 @@ public class MomentResource extends AbstractResource {
         LOGGER.info("Incoming request to create a new moment under journy {} for alias {}", journeyId, aliasId);
 
         AliasBase aliasBase = assertAliasInContext(aliasId);
-        aliasBase.jsonIdOnly = true;
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
         if (journey.getAlias().equals(aliasBase) || journey.getJoinedAliases().contains(aliasBase)) {
             moment.setJourney(new JourneyBase().clone(journey));
@@ -83,10 +82,11 @@ public class MomentResource extends AbstractResource {
             @NotBlank @PathParam("momentId") String momentId,
             @NotNull @Valid MomentBase changedMoment) {
         LOGGER.info("Incoming request to update moment {}", momentId);
-        MomentBase existingMoment = momentService.getMomentBase(momentId);
+        MomentDetail existingMoment = momentService.getMomentDetail(momentId);
         assertAliasInContext(existingMoment.getAlias().getId());
         existingMoment.copy(changedMoment);
-        return momentService.save(existingMoment);
+        existingMoment = momentService.save(existingMoment);
+        return changedMoment.clone(existingMoment);
 
     }
 }

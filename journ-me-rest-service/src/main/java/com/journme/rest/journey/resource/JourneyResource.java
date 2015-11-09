@@ -5,8 +5,8 @@ import com.journme.domain.AliasDetail;
 import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -72,11 +72,12 @@ public class JourneyResource extends AbstractResource {
             @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
 
-        JourneyBase existingJourney = journeyService.getJourneyBase(journeyId);
+        JourneyDetails existingJourney = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(existingJourney.getAlias().getId());
         existingJourney.copy(changedJourney);
 
-        return journeyService.save(existingJourney);
+        existingJourney = journeyService.save(existingJourney);
+        return changedJourney.clone(existingJourney);
     }
 
     @POST
