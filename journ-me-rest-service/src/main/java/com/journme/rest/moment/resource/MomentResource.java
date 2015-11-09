@@ -58,7 +58,7 @@ public class MomentResource extends AbstractResource {
         AliasBase aliasBase = assertAliasInContext(aliasId);
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
         if (journey.getAlias().equals(aliasBase) || journey.getJoinedAliases().contains(aliasBase)) {
-            moment.setJourney(new JourneyBase().clone(journey));
+            moment.setJourney(journey);
             moment.setAlias(aliasBase);
 
             moment.setId(null); //ensures that new Moment is created in the collection
@@ -86,7 +86,7 @@ public class MomentResource extends AbstractResource {
         assertAliasInContext(existingMoment.getAlias().getId());
         existingMoment.copy(changedMoment);
         existingMoment = momentService.save(existingMoment);
-        return changedMoment.clone(existingMoment);
+        return changedMoment.copyAll(existingMoment);
 
     }
 }

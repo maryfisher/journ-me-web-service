@@ -94,10 +94,9 @@ public class JourneyBase extends AbstractEntity {
         return this;
     }
 
-    @Override
-    public JourneyBase clone(AbstractEntity other) {
-        super.clone(other);
-        copy((JourneyBase) other);
+    public JourneyBase copyAll(JourneyBase other) {
+        super.copyAll(other);
+        copy(other);
         return this;
     }
 }

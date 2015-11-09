@@ -21,7 +21,7 @@ public class AliasBase extends AbstractEntity {
 
     @DBRef
     @JsonSerialize(using = EntityToIdSerializer.class)
-    @JsonDeserialize(using= NullDeserializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private AliasImage image;
 
     public String getName() {
@@ -50,8 +50,8 @@ public class AliasBase extends AbstractEntity {
         return this;
     }
 
-    public AliasBase clone(AliasBase other) {
-        super.clone(other);
+    public AliasBase copyAll(AliasBase other) {
+        super.copyAll(other);
         copy(other);
         return this;
     }

@@ -77,7 +77,7 @@ public class JourneyResource extends AbstractResource {
         existingJourney.copy(changedJourney);
 
         existingJourney = journeyService.save(existingJourney);
-        return changedJourney.clone(existingJourney);
+        return changedJourney.copyAll(existingJourney);
     }
 
     @POST
@@ -184,10 +184,9 @@ public class JourneyResource extends AbstractResource {
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(journey.getAlias().getId());
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
-        AliasBase aliasBase = new AliasBase().clone(aliasDetail);
 
-        journey.getJoinRequests().remove(aliasBase);
-        journey.getJoinedAliases().add(aliasBase);
+        journey.getJoinRequests().remove(aliasDetail);
+        journey.getJoinedAliases().add(aliasDetail);
         journey = journeyService.save(journey);
 
         aliasDetail.getJoinedJourneys().add(journey);

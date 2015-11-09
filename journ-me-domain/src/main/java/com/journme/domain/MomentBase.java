@@ -64,10 +64,9 @@ public class MomentBase extends AbstractEntity {
         return this;
     }
 
-    @Override
-    public MomentBase clone(AbstractEntity other) {
-        super.clone(other);
-        copy((MomentBase) other);
+    public MomentBase copyAll(MomentBase other) {
+        super.copyAll(other);
+        copy(other);
         return this;
     }
 }

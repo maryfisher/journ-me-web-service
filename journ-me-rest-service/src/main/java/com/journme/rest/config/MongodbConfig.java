@@ -1,8 +1,6 @@
 package com.journme.rest.config;
 
 import com.journme.domain.AbstractEntity;
-import com.journme.domain.AliasBase;
-import com.journme.domain.AliasDetail;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
@@ -10,10 +8,8 @@ import com.mongodb.ServerAddress;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
@@ -79,20 +75,5 @@ public class MongodbConfig extends AbstractMongoConfiguration {
         // DefaultMongoTypeMapper(null) suppresses the _class to be persisted
         converter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return converter;
-    }
-
-    @Bean
-    @Override
-    public CustomConversions customConversions() {
-        return new CustomConversions(singletonList(new AliasConverter()));
-    }
-
-    private class AliasConverter implements Converter<AliasDetail, AliasBase> {
-
-        public AliasBase convert(AliasDetail source) {
-            AliasBase dest = new AliasBase();
-            dest.clone(source);
-            return dest;
-        }
     }
 }

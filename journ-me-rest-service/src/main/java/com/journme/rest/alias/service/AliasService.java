@@ -62,6 +62,10 @@ public class AliasService {
         return aliasImageRepository.findOne(aliasImageId);
     }
 
+    public void deleteImage(String aliasImageId) {
+        aliasImageRepository.delete(aliasImageId);
+    }
+
     private void throwAliasExc(String aliasId) {
         throw new JournMeException("No Alias found for given alias ID " + aliasId,
                 Response.Status.BAD_REQUEST,

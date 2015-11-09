@@ -62,14 +62,14 @@ public class AliasResource extends AbstractImageResource {
             String imageName = imagePart.getContentDisposition().getFileName();
             String mimeType = imagePart.getMediaType().toString();
 
-            // Spring cannot upsert Proxy, hence retrieving the true AliasImage from DB
-            AliasImage aliasImage = existingAlias.getImage() != null ?
-                    aliasService.getImage(existingAlias.getImage().getId()) : new AliasImage();
-            aliasImage.setName(imageName);
-            aliasImage.setMediaType(mimeType);
-            aliasImage.setImage(image);
+            AliasImage aliasImage = existingAlias.getImage();
+            if (aliasImage != null) {
+                // cannot reuse same image entity in DB for new image binary, because browser cached image according to ID
+                aliasService.deleteImage(aliasImage.getId());
+            }
+            aliasImage = new AliasImage(imageName, mimeType, image);
 
-            //TODO: generate small thumbnail from original image
+            //TODO: generate small resolution image from original image
 
             aliasImage = aliasService.save(aliasImage);
             changedAlias.setImage(aliasImage);
@@ -77,7 +77,7 @@ public class AliasResource extends AbstractImageResource {
 
         existingAlias.copy(changedAlias);
         existingAlias = aliasService.save(existingAlias);
-        return aliasBaseInContext.clone(existingAlias);
+        return aliasBaseInContext.copyAll(existingAlias);
     }
 
     @GET

@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EntityToIdSerializer;
@@ -18,7 +19,18 @@ import java.util.List;
 @Document(collection = "blink")
 public class Blink extends AbstractEntity {
 
-    private Integer format = 0;
+    public enum BlinkFormat {
+        RIGHT_IMAGE,
+        LEFT_IMAGE,
+        DOUBLE_TEXT,
+        SINGLE_TEXT,
+        VIDEO,
+        SINGLE_IMAGE,
+        DOUBLE_IMAGE
+    }
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    private BlinkFormat format = BlinkFormat.RIGHT_IMAGE;
 
     @DBRef
     @JsonSerialize(contentUsing = EntityToIdSerializer.class)
@@ -40,11 +52,11 @@ public class Blink extends AbstractEntity {
     @DBRef
     private List<State> states = new ArrayList<>();
 
-    public Integer getFormat() {
+    public BlinkFormat getFormat() {
         return format;
     }
 
-    public void setFormat(Integer format) {
+    public void setFormat(BlinkFormat format) {
         this.format = format;
     }
 
@@ -100,18 +112,19 @@ public class Blink extends AbstractEntity {
         if (other.format != null) {
             this.format = other.format;
         }
-        if (other.images != null) {
-            this.images = other.images;
-        }
+        // Note: cannot copy over images, else losing them
+//        if (other.images != null) {
+//            this.images = other.images;
+//        }
         if (other.texts != null) {
             this.texts = other.texts;
         }
         if (other.index != null) {
             this.index = other.index;
         }
-        if (other.moment != null) {
-            this.moment = other.moment;
-        }
+//        if (other.moment != null) {
+//            this.moment = other.moment;
+//        }
         if (other.ratio != null) {
             this.ratio = other.ratio;
         }

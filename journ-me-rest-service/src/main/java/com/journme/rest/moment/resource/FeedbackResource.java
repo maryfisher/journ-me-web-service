@@ -2,7 +2,6 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.AliasBase;
 import com.journme.domain.Feedback;
-import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
@@ -53,7 +52,7 @@ public class FeedbackResource extends AbstractResource {
         MomentDetail moment = momentService.getMomentDetail(momentId);
 
         feedback.setAlias(alias);
-        feedback.setMoment(new MomentBase().clone(moment));
+        feedback.setMoment(moment);
         feedback.setId(null); //ensures that new Feedback is created in the collection
         feedback = feedbackRepository.save(feedback);
 

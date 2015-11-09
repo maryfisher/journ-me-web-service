@@ -2,7 +2,6 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.Blink;
 import com.journme.domain.BlinkImage;
-import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
@@ -77,7 +76,7 @@ public class BlinkResource extends AbstractImageResource {
 
                 BlinkImage blinkImage = new BlinkImage(imageName, mimeType, image);
 
-                //TODO: generate small thumbnail from original image
+                //TODO: generate small resolution image from original image
 
                 blinkImage = blinkImageRepository.save(blinkImage);
                 blink.getImages().add(blinkImage);
@@ -85,7 +84,7 @@ public class BlinkResource extends AbstractImageResource {
         }
 
         blink.setIndex(moment.getBlinks().size());
-        blink.setMoment(new MomentBase().clone(moment));
+        blink.setMoment(moment);
         blink.setId(null); //ensures that new Moment is created in the collection
         blink = blinkRepository.save(blink);
 
@@ -113,10 +112,38 @@ public class BlinkResource extends AbstractImageResource {
                     Response.Status.BAD_REQUEST,
                     JournMeExceptionDto.ExceptionCode.BLINK_NONEXISTENT);
         }
-
-        //TODO: how should update blink affect already stored images?
-
         assertAliasInContext(existingBlink.getMoment().getAlias().getId());
+
+        int indexCount = 0;
+        if (imageParts != null && !imageParts.isEmpty()) {
+            for (FormDataBodyPart imagePart : imageParts) {
+                if (imagePart != null) {
+                    String imageName = imagePart.getContentDisposition().getFileName();
+                    String mimeType = imagePart.getMediaType().toString();
+                    byte[] image = toByteArray(imagePart);
+
+                    BlinkImage blinkImage = existingBlink.getImages().get(indexCount);
+                    if (blinkImage != null) {
+                        // cannot reuse same image entity in DB for new image binary, because browser cached image according to ID
+                        blinkRepository.delete(blinkImage.getId());
+                    }
+                    blinkImage = new BlinkImage(imageName, mimeType, image);
+
+                    //TODO: generate small resolution image from original image
+
+                    blinkImage = blinkImageRepository.save(blinkImage);
+                    existingBlink.getImages().set(indexCount, blinkImage);
+                }
+                indexCount++;
+            }
+        }
+        //If changing from 2 image format to 1 image format, must avoid keeping the orphaned image in the DB
+        if (existingBlink.getFormat() == Blink.BlinkFormat.DOUBLE_IMAGE && changedBlink.getFormat() != Blink.BlinkFormat.DOUBLE_IMAGE) {
+            List<BlinkImage> existingImages = existingBlink.getImages();
+            blinkImageRepository.delete(existingImages.get(1).getId());
+            existingImages.remove(1);
+        }
+
         existingBlink.copy(changedBlink);
         return blinkRepository.save(existingBlink);
 
