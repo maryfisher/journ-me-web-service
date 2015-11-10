@@ -3,9 +3,9 @@ package com.journme.rest.user.resource;
 import com.journme.domain.AliasBase;
 import com.journme.domain.User;
 import com.journme.rest.alias.repository.AliasBaseRepository;
-import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.common.security.IPasswordHashingService;
 import com.journme.rest.contract.JournMeExceptionDto;
@@ -73,7 +73,9 @@ public class UserResource extends AbstractResource {
     @Path("/authentication/token-login")
     @ProtectedByAuthToken
     public LoginResponse tokenLogin() {
-        return sendLoginResponse(returnUserFromContext());
+        User loggedInUser = returnUserFromContext();
+        LOGGER.info("Automatic token login for user with email {}", loggedInUser.getEmail());
+        return sendLoginResponse(loggedInUser);
     }
 
     private LoginResponse sendLoginResponse(User user) {

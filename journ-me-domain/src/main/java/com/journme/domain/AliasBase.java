@@ -19,7 +19,7 @@ public class AliasBase extends AbstractEntity {
     @NotBlank
     private String name;
 
-    @DBRef
+    @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(using = NullDeserializer.class)
     private AliasImage image;

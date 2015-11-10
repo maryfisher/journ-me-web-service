@@ -21,7 +21,7 @@ public class Feedback extends AbstractEntity {
     @DBRef
     private AliasBase alias;
 
-    @DBRef
+    @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(using= NullDeserializer.class)
     private MomentBase moment;

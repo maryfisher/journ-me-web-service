@@ -27,7 +27,7 @@ public class JourneyBase extends AbstractEntity {
 
     private String descript;
 
-    @DBRef
+    @DBRef(lazy = true)
     private AliasBase alias;
 
     @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)

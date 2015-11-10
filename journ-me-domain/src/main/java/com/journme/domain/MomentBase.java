@@ -17,12 +17,12 @@ public class MomentBase extends AbstractEntity {
 
     private Boolean isPublic;
 
-    @DBRef
+    @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(using = NullDeserializer.class)
     private AliasBase alias;
 
-    @DBRef
+    @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(using = NullDeserializer.class)
     private JourneyBase journey;
