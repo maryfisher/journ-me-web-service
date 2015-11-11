@@ -1,6 +1,11 @@
 package com.journme.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.journme.domain.converter.EmptyArrayDeserializer;
+import com.journme.domain.converter.EntityToIdSerializer;
+import com.journme.domain.converter.NullDeserializer;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -23,9 +28,13 @@ public class User extends AbstractEntity {
     private String email;
 
     @DBRef(lazy = true)
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(using = EmptyArrayDeserializer.class)
     private List<AliasBase> aliases = new ArrayList<>();
 
     @DBRef(lazy = true)
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private AliasBase currentAlias;
 
     @JsonIgnore

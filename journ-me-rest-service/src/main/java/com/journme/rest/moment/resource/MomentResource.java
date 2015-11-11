@@ -2,9 +2,9 @@ package com.journme.rest.moment.resource;
 
 import com.journme.domain.*;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.service.JourneyService;
 import com.journme.rest.moment.service.MomentService;
@@ -58,7 +58,7 @@ public class MomentResource extends AbstractResource {
         AliasBase aliasBase = assertAliasInContext(aliasId);
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
         if (journey.getAlias().equals(aliasBase) || journey.getJoinedAliases().contains(aliasBase)) {
-            moment.setJourney(new JourneyBase().clone(journey));
+            moment.setJourney(journey);
             moment.setAlias(aliasBase);
 
             moment.setId(null); //ensures that new Moment is created in the collection
@@ -82,10 +82,11 @@ public class MomentResource extends AbstractResource {
             @NotBlank @PathParam("momentId") String momentId,
             @NotNull @Valid MomentBase changedMoment) {
         LOGGER.info("Incoming request to update moment {}", momentId);
-        MomentBase existingMoment = momentService.getMomentBase(momentId);
+        MomentDetail existingMoment = momentService.getMomentDetail(momentId);
         assertAliasInContext(existingMoment.getAlias().getId());
         existingMoment.copy(changedMoment);
-        return momentService.save(existingMoment);
+        existingMoment = momentService.save(existingMoment);
+        return changedMoment.copyAll(existingMoment);
 
     }
 }

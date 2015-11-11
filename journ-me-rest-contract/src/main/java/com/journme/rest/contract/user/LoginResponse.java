@@ -23,6 +23,8 @@ public class LoginResponse {
 
     private String email;
 
+    private String id;
+
     private List<String> aliases = new ArrayList<>();
 
     private String currentAlias;
@@ -31,6 +33,7 @@ public class LoginResponse {
 
     public LoginResponse(User user) {
         headerItems = new HashMap<>();
+        id = user.getId();
         email = user.getEmail();
         aliases = new ArrayList<>(user.getAliases().size());
         aliases.addAll(user.getAliases().stream().map(AliasBase::getId).collect(Collectors.toList()));
@@ -55,6 +58,14 @@ public class LoginResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<String> getAliases() {

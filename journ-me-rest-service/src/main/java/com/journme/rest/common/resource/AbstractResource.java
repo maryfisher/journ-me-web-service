@@ -1,9 +1,11 @@
-package com.journme.rest.common;
+package com.journme.rest.common.resource;
 
+import com.journme.domain.AbstractEntity;
 import com.journme.domain.AliasBase;
 import com.journme.domain.User;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.AuthTokenFilter;
+import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,21 +38,42 @@ public abstract class AbstractResource {
         return ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser();
     }
 
-    protected AliasBase assertAliasInContext(String theAliasId) {
+    protected AliasBase assertAliasInContext(String... aliasIds) {
         List<AliasBase> userAliases = ((AuthTokenFilter.UserPrincipal) securityContext.getUserPrincipal()).getUser().getAliases();
 
-        for (AliasBase userAlias : userAliases) {
-            if (userAlias.equalsId(theAliasId)) {
-                return userAlias;
+        for (String aliasId : aliasIds) {
+            for (AliasBase userAlias : userAliases) {
+                if (userAlias.equalsId(aliasId)) {
+                    return userAlias;
+                }
             }
         }
-        throw new JournMeException("No Alias found for given alias ID " + theAliasId,
+
+        throw new JournMeException("User does not own alias with any of the alias IDs "
+                + String.join(",", Arrays.asList(aliasIds)),
                 Response.Status.BAD_REQUEST,
                 JournMeExceptionDto.ExceptionCode.ALIAS_NONEXISTENT);
     }
 
     protected byte[] toByteArray(FormDataBodyPart imagePart) throws IOException {
         return imagePart != null ? IOUtils.toByteArray(imagePart.getValueAs(InputStream.class)) : null;
+    }
+
+    public static abstract class AbstractImageResource extends AbstractResource {
+
+        protected Response sendImageResponse(AbstractEntity.AbstractImageEntity image, ImageClassifier imageClassifier) {
+            if (image != null) {
+                byte[] imageData = (imageClassifier == ImageClassifier.thumbnail && image.getThumbnail() != null) ?
+                        image.getThumbnail() : image.getImage();
+                return Response.
+                        status(Response.Status.OK).
+                        entity(imageData).
+                        type(image.getMediaType()).
+                        build();
+            } else {
+                return Response.noContent().build();
+            }
+        }
     }
 
 }

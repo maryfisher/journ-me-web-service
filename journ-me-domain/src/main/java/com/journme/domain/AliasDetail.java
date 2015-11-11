@@ -10,7 +10,7 @@ import java.util.List;
  * @version 1.0
  * @since 28.10.2015
  */
-public class AliasDetail extends AbstractAlias {
+public class AliasDetail extends AliasBase {
 
     @DBRef
     private List<JourneyBase> journeys = new ArrayList<>();

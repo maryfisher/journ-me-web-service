@@ -4,6 +4,8 @@ import com.journme.domain.AliasBase;
 import com.journme.domain.User;
 import com.journme.rest.alias.repository.AliasBaseRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.common.security.IPasswordHashingService;
 import com.journme.rest.contract.JournMeExceptionDto;
@@ -14,16 +16,13 @@ import com.journme.rest.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 /**
@@ -35,9 +34,7 @@ import javax.ws.rs.core.Response;
  */
 @Component
 @Singleton
-@Consumes(MediaType.APPLICATION_JSON_VALUE)
-@Produces(MediaType.APPLICATION_JSON_VALUE)
-public class UserResource {
+public class UserResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
@@ -68,10 +65,23 @@ public class UserResource {
                     Response.Status.UNAUTHORIZED,
                     JournMeExceptionDto.ExceptionCode.AUTHENTICATION_FAILED);
         } else {
-            LoginResponse loginResponse = new LoginResponse(user);
-            loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
-            return loginResponse;
+            return sendLoginResponse(user);
         }
+    }
+
+    @POST
+    @Path("/authentication/token-login")
+    @ProtectedByAuthToken
+    public LoginResponse tokenLogin() {
+        User loggedInUser = returnUserFromContext();
+        LOGGER.info("Automatic token login for user with email {}", loggedInUser.getEmail());
+        return sendLoginResponse(loggedInUser);
+    }
+
+    private LoginResponse sendLoginResponse(User user) {
+        LoginResponse loginResponse = new LoginResponse(user);
+        loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
+        return loginResponse;
     }
 
     @POST
@@ -109,6 +119,14 @@ public class UserResource {
         LoginResponse loginResponse = new LoginResponse(newUser);
         loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));
         return loginResponse;
+    }
+
+    @POST
+    @Path("/authentication/logout")
+    @ProtectedByAuthToken
+    public void logout() {
+        User user = returnUserFromContext();
+        LOGGER.info("Incoming request to logout user with id {}", user.getId());
     }
 
     private boolean verifyPassword(String loginPassword, User user) {

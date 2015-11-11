@@ -5,8 +5,8 @@ import com.journme.domain.AliasDetail;
 import com.journme.domain.JourneyBase;
 import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.service.AliasService;
-import com.journme.rest.common.AbstractResource;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -72,11 +72,12 @@ public class JourneyResource extends AbstractResource {
             @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
 
-        JourneyBase existingJourney = journeyService.getJourneyBase(journeyId);
+        JourneyDetails existingJourney = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(existingJourney.getAlias().getId());
         existingJourney.copy(changedJourney);
 
-        return journeyService.save(existingJourney);
+        existingJourney = journeyService.save(existingJourney);
+        return changedJourney.copyAll(existingJourney);
     }
 
     @POST
@@ -181,11 +182,11 @@ public class JourneyResource extends AbstractResource {
         LOGGER.info("Incoming request to accept joining journey {} with alias {}", journeyId, aliasId);
 
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
-        AliasBase aliasBase = assertAliasInContext(journey.getAlias().getId());
+        assertAliasInContext(journey.getAlias().getId());
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
 
-        journey.getJoinRequests().remove(aliasBase);
-        journey.getJoinedAliases().add(aliasBase);
+        journey.getJoinRequests().remove(aliasDetail);
+        journey.getJoinedAliases().add(aliasDetail);
         journey = journeyService.save(journey);
 
         aliasDetail.getJoinedJourneys().add(journey);
@@ -200,9 +201,9 @@ public class JourneyResource extends AbstractResource {
             @NotBlank @PathParam("aliasId") String aliasId) {
         LOGGER.info("Incoming request to unjoin journey {} with alias {}", journeyId, aliasId);
 
-        assertAliasInContext(aliasId);
-        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
         JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        assertAliasInContext(aliasId, journey.getAlias().getId());
+        AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
 
         journey.getJoinedAliases().remove(aliasDetail);
         journey = journeyService.save(journey);

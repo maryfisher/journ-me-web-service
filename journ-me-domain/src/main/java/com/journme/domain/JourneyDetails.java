@@ -15,22 +15,22 @@ import java.util.List;
  */
 public class JourneyDetails extends JourneyBase {
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<MomentBase> moments = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<AliasBase> followers = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<JourneyBase> linkedToJourneys = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<JourneyBase> linkedFromJourneys = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<AliasBase> joinedAliases = new ArrayList<>();
 
-    @DBRef
+    @DBRef(lazy = true)
     private List<AliasBase> joinRequests = new ArrayList<>();
 
     public List<MomentBase> getMoments() {

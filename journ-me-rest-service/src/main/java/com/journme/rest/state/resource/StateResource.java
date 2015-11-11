@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import java.util.List;
 
 /**
@@ -27,7 +26,6 @@ public class StateResource {
     private StateRepository stateRepository;
 
     @GET
-    @Path("/")
     public List<State> retrieveState() {
         LOGGER.debug("Incoming request to retrieve all states");
         return stateRepository.findAll();

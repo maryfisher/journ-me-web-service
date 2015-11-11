@@ -77,7 +77,7 @@ public abstract class AbstractEntity {
         return id != null ? id.hashCode() : 0;
     }
 
-    public AbstractEntity clone(AbstractEntity other) {
+    public AbstractEntity copyAll(AbstractEntity other) {
         if (other.id != null) {
             this.id = other.id;
         }
@@ -104,6 +104,7 @@ public abstract class AbstractEntity {
         }
 
         public AbstractImageEntity(String name, String mediaType, byte[] image) {
+            this();
             this.name = name;
             this.mediaType = mediaType;
             this.image = image;

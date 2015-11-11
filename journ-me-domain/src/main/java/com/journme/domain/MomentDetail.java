@@ -1,5 +1,9 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.journme.domain.converter.EmptyArrayDeserializer;
+import com.journme.domain.converter.EntityToIdSerializer;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
@@ -19,6 +23,8 @@ public class MomentDetail extends MomentBase {
     private List<Feedback> feedback = new ArrayList<>();
 
     @DBRef(lazy = true)
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(using = EmptyArrayDeserializer.class)
     private List<Blink> blinks = new ArrayList<>();
 
     public List<State> getStates() {

@@ -1,5 +1,9 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.journme.domain.converter.EntityToIdSerializer;
+import com.journme.domain.converter.NullDeserializer;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,9 +18,13 @@ public class MomentBase extends AbstractEntity {
     private Boolean isPublic;
 
     @DBRef(lazy = true)
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private AliasBase alias;
 
     @DBRef(lazy = true)
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(using = NullDeserializer.class)
     private JourneyBase journey;
 
     public Boolean getIsPublic() {
@@ -43,16 +51,22 @@ public class MomentBase extends AbstractEntity {
         this.journey = journey;
     }
 
-    public void copy(MomentBase other) {
+    public MomentBase copy(MomentBase other) {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
+        if (other.alias != null) {
+            this.alias = other.alias;
+        }
+        if (other.journey != null) {
+            this.journey = other.journey;
+        }
+        return this;
     }
 
-    @Override
-    public MomentBase clone(AbstractEntity other) {
-        super.clone(other);
-        copy((MomentBase) other);
+    public MomentBase copyAll(MomentBase other) {
+        super.copyAll(other);
+        copy(other);
         return this;
     }
 }
