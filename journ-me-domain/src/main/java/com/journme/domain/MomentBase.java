@@ -7,6 +7,8 @@ import com.journme.domain.converter.NullConverter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 /**
  * @author mary_fisher
  * @version 1.0
@@ -14,6 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "moment")
 public class MomentBase extends AbstractEntity {
+
+    private Date date;
 
     private Boolean isPublic;
 
@@ -26,6 +30,14 @@ public class MomentBase extends AbstractEntity {
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(converter = NullConverter.class)
     private JourneyBase journey;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public Boolean getIsPublic() {
         return isPublic;
@@ -60,6 +72,9 @@ public class MomentBase extends AbstractEntity {
         }
         if (other.journey != null) {
             this.journey = other.journey;
+        }
+        if (other.date != null) {
+            this.date = other.date;
         }
         return this;
     }
