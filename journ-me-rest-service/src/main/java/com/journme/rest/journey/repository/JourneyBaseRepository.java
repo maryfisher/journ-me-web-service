@@ -2,6 +2,7 @@ package com.journme.rest.journey.repository;
 
 import com.journme.domain.JourneyBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 /**
  * <h1>DAO repository class</h1>
@@ -11,6 +12,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @version 1.0
  * @since 24.10.2015
  */
-public interface JourneyBaseRepository extends MongoRepository<JourneyBase, String> {
+public interface JourneyBaseRepository extends MongoRepository<JourneyBase, String>, QueryDslPredicateExecutor<JourneyBase> {
 
 }
