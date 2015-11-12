@@ -2,6 +2,7 @@ package com.journme.rest.alias.repository;
 
 import com.journme.domain.AliasBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
 /**
  * <h1>DAO repository class</h1>
@@ -11,5 +12,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * @version 1.0
  * @since 26.10.2015
  */
-public interface AliasBaseRepository extends MongoRepository<AliasBase, String> {
+public interface AliasBaseRepository extends MongoRepository<AliasBase, String>, QueryDslPredicateExecutor<AliasBase> {
 }

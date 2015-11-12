@@ -1,6 +1,7 @@
 package com.journme.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.mongodb.morphia.annotations.Entity;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,6 +16,7 @@ import java.util.Date;
  * @version 1.0
  * @since 24.10.2015
  */
+@Entity
 public abstract class AbstractEntity {
 
     @Id
