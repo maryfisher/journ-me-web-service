@@ -35,6 +35,11 @@ public class AliasResource extends AbstractImageResource {
     @Autowired
     private AliasService aliasService;
 
+    @Path("/dashboard")
+    public Class<DashboardResource> getStatResource() {
+        return DashboardResource.class;
+    }
+
     @GET
     @Path("/{aliasId}")
     public AliasDetail retrieveAlias(@NotBlank @PathParam("aliasId") String aliasId) {

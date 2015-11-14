@@ -2,6 +2,7 @@ package com.journme.rest.config;
 
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.journey.service.JourneyService;
+import com.journme.rest.moment.service.FeedbackService;
 import com.journme.rest.moment.service.MomentService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,5 +28,10 @@ public class ServiceConfig {
     @Bean
     public MomentService momentService() {
         return new MomentService();
+    }
+
+    @Bean
+    public FeedbackService feedbackService() {
+        return new FeedbackService();
     }
 }

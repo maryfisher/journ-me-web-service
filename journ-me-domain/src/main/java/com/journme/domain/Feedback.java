@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EntityToIdSerializer;
@@ -21,6 +22,15 @@ public class Feedback extends AbstractEntity {
     @DBRef
     private AliasBase alias;
 
+    @JsonIgnore
+    @DBRef(lazy = true)
+    private AliasBase momentAlias;
+
+    @DBRef(lazy = true)
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(converter = NullConverter.class)
+    private JourneyBase journey;
+
     @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(converter = NullConverter.class)
@@ -38,6 +48,22 @@ public class Feedback extends AbstractEntity {
 
     public void setAlias(AliasBase alias) {
         this.alias = alias;
+    }
+
+    public AliasBase getMomentAlias() {
+        return momentAlias;
+    }
+
+    public void setMomentAlias(AliasBase momentAlias) {
+        this.momentAlias = momentAlias;
+    }
+
+    public JourneyBase getJourney() {
+        return journey;
+    }
+
+    public void setJourney(JourneyBase journey) {
+        this.journey = journey;
     }
 
     public MomentBase getMoment() {
