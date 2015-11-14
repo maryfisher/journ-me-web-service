@@ -1,5 +1,9 @@
 package com.journme.rest.common.errorhandling;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jaxrs.base.JsonParseExceptionMapper;
 import com.journme.rest.contract.JournMeExceptionDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,5 +54,39 @@ public class JerseyExceptionMapper implements ExceptionMapper<Throwable> {
         }
 
         return rb.type(MediaType.APPLICATION_JSON).build();
+    }
+
+    // Overwrite the default JsonParseExceptionMapper that is registered via JacksonFeature
+    @Provider
+    public static class JacksonParseExceptionMapper extends JsonParseExceptionMapper {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(JacksonParseExceptionMapper.class);
+
+        @Override
+        public Response toResponse(JsonParseException ex) {
+            LOGGER.warn("Json parsing exception: ", ex);
+            return Response.
+                    status(Response.Status.INTERNAL_SERVER_ERROR).
+                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.INTERNAL_SYSTEM_PROBLEM)).
+                    type(MediaType.APPLICATION_JSON).
+                    build();
+        }
+    }
+
+    // Overwrite the default JsonMappingExceptionMapper that is registered via JacksonFeature
+    @Provider
+    public static class JacksonMappingExceptionMapper extends JsonMappingExceptionMapper {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(JacksonParseExceptionMapper.class);
+
+        @Override
+        public Response toResponse(JsonMappingException ex) {
+            LOGGER.warn("Json mapping exception: ", ex);
+            return Response.
+                    status(Response.Status.INTERNAL_SERVER_ERROR).
+                    entity(new JournMeExceptionDto(JournMeExceptionDto.ExceptionCode.INTERNAL_SYSTEM_PROBLEM)).
+                    type(MediaType.APPLICATION_JSON).
+                    build();
+        }
     }
 }

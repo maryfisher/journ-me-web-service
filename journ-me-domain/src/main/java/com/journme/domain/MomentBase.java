@@ -21,6 +21,8 @@ public class MomentBase extends AbstractEntity {
 
     private Boolean isPublic;
 
+    private String title;
+
     @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(converter = NullConverter.class)
@@ -45,6 +47,14 @@ public class MomentBase extends AbstractEntity {
 
     public void setIsPublic(Boolean isPublic) {
         this.isPublic = isPublic;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public AliasBase getAlias() {

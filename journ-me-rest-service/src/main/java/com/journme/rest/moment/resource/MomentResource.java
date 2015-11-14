@@ -1,7 +1,9 @@
 package com.journme.rest.moment.resource;
 
-import com.journme.domain.*;
-import com.journme.rest.alias.service.AliasService;
+import com.journme.domain.AliasBase;
+import com.journme.domain.JourneyDetails;
+import com.journme.domain.MomentBase;
+import com.journme.domain.MomentDetail;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
@@ -36,9 +38,6 @@ public class MomentResource extends AbstractResource {
 
     @Autowired
     private JourneyService journeyService;
-
-    @Autowired
-    private AliasService aliasService;
 
     @GET
     @Path("/{momentId}")

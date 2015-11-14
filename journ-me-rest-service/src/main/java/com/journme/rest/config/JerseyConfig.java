@@ -43,6 +43,8 @@ public class JerseyConfig extends ResourceConfig {
 
         //Jersey exception mappings
         register(JerseyExceptionMapper.class);
+        register(JerseyExceptionMapper.JacksonMappingExceptionMapper.class);
+        register(JerseyExceptionMapper.JacksonParseExceptionMapper.class);
     }
 
     @Provider
