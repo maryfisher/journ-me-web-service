@@ -1,14 +1,13 @@
 package com.journme.rest.moment.resource;
 
-import com.journme.domain.AliasBase;
-import com.journme.domain.JourneyDetails;
-import com.journme.domain.MomentBase;
-import com.journme.domain.MomentDetail;
+import com.journme.domain.*;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.service.JourneyService;
+import com.journme.rest.moment.repository.MomentImageRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ import javax.ws.rs.core.Response;
  */
 @Component
 @Singleton
-public class MomentResource extends AbstractResource {
+public class MomentResource extends AbstractResource.AbstractImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MomentResource.class);
 
@@ -38,6 +37,9 @@ public class MomentResource extends AbstractResource {
 
     @Autowired
     private JourneyService journeyService;
+
+    @Autowired
+    private MomentImageRepository momentImageRepository;
 
     @GET
     @Path("/{momentId}")
@@ -87,5 +89,21 @@ public class MomentResource extends AbstractResource {
         existingMoment = momentService.save(existingMoment);
         return changedMoment.copyAll(existingMoment);
 
+    }
+
+    @GET
+    @Path("/image/{momentImageId}/{imageClassifier:\\w*}")
+    public Response retrieveImageWithClassifier(
+            @NotBlank @PathParam("momentImageId") String momentImageId,
+            @DefaultValue("original") @PathParam("imageClassifier") ImageClassifier imageClassifier) {
+        LOGGER.info("Incoming request to retrieve {} blink image {}", imageClassifier, momentImageId);
+        MomentImage image = momentImageRepository.findOne(momentImageId);
+        return sendImageResponse(image, imageClassifier);
+    }
+
+    @GET
+    @Path("/image/{momentImageId}")
+    public Response retrieveImage(@NotBlank @PathParam("momentImageId") String momentImageId) {
+        return retrieveImageWithClassifier(momentImageId, ImageClassifier.original);
     }
 }

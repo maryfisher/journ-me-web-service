@@ -26,6 +26,11 @@ public class MomentBase extends AbstractEntity {
     @DBRef(lazy = true)
     @JsonSerialize(using = EntityToIdSerializer.class)
     @JsonDeserialize(converter = NullConverter.class)
+    private MomentImage thumb;
+
+    @DBRef(lazy = true)
+    @JsonSerialize(using = EntityToIdSerializer.class)
+    @JsonDeserialize(converter = NullConverter.class)
     private AliasBase alias;
 
     @DBRef(lazy = true)
@@ -55,6 +60,14 @@ public class MomentBase extends AbstractEntity {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public MomentImage getThumb() {
+        return thumb;
+    }
+
+    public void setThumb(MomentImage thumb) {
+        this.thumb = thumb;
     }
 
     public AliasBase getAlias() {

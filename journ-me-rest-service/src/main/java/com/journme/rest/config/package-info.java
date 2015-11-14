@@ -14,10 +14,10 @@
         JourneyDetails.class,
         MomentBase.class,
         MomentDetail.class,
+        MomentImage.class,
         State.class,
         User.class
-})
-package com.journme.rest.config;
+}) package com.journme.rest.config;
 
 import com.journme.domain.*;
 import com.mysema.query.annotations.QueryEntities;

@@ -3,6 +3,7 @@ package com.journme.rest.moment.resource;
 import com.journme.domain.Blink;
 import com.journme.domain.BlinkImage;
 import com.journme.domain.MomentDetail;
+import com.journme.domain.MomentImage;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource.AbstractImageResource;
@@ -10,6 +11,7 @@ import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.BlinkImageRepository;
 import com.journme.rest.moment.repository.BlinkRepository;
+import com.journme.rest.moment.repository.MomentImageRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -20,9 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -45,6 +51,9 @@ public class BlinkResource extends AbstractImageResource {
 
     @Autowired
     private BlinkImageRepository blinkImageRepository;
+
+    @Autowired
+    private MomentImageRepository momentImageRepository;
 
     @GET
     @Path("/{blinkId}/")
@@ -73,6 +82,17 @@ public class BlinkResource extends AbstractImageResource {
                 String imageName = imagePart.getContentDisposition().getFileName();
                 String mimeType = imagePart.getMediaType().toString();
                 byte[] image = toByteArray(imagePart);
+
+                if (moment.getThumb() == null) {
+                    BufferedImage bImage = createResizedCopy(ImageIO.read(new ByteArrayInputStream(image)), 40, 40, true);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(bImage, "jpg", baos);
+                    baos.flush();
+                    MomentImage momentImage = new MomentImage(imageName, mimeType, null);
+                    momentImage.setThumbnail(baos.toByteArray());
+                    momentImage = momentImageRepository.save(momentImage);
+                    moment.setThumb(momentImage);
+                }
 
                 BlinkImage blinkImage = new BlinkImage(imageName, mimeType, image);
 
