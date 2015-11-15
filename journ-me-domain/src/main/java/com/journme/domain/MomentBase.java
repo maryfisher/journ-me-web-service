@@ -99,6 +99,9 @@ public class MomentBase extends AbstractEntity {
         if (other.date != null) {
             this.date = other.date;
         }
+        if (other.title != null) {
+            this.title = other.title;
+        }
         return this;
     }
 
