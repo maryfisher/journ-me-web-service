@@ -1,6 +1,7 @@
 package com.journme.rest;
 
 import com.journme.rest.alias.resource.AliasResource;
+import com.journme.rest.home.StatsResource;
 import com.journme.rest.journey.resource.JourneyResource;
 import com.journme.rest.moment.resource.BlinkResource;
 import com.journme.rest.moment.resource.FeedbackResource;
@@ -76,6 +77,11 @@ public class RootResource {
     @Path("/blink")
     public Class<BlinkResource> getBlinkResource() {
         return BlinkResource.class;
+    }
+
+    @Path("/stats")
+    public Class<StatsResource> getStatResource() {
+        return StatsResource.class;
     }
 
 }

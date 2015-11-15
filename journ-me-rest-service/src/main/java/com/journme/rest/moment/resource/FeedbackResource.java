@@ -53,6 +53,8 @@ public class FeedbackResource extends AbstractResource {
 
         feedback.setAlias(alias);
         feedback.setMoment(moment);
+        feedback.setMomentAlias(moment.getAlias());
+        feedback.setJourney(moment.getJourney());
         feedback.setId(null); //ensures that new Feedback is created in the collection
         feedback = feedbackRepository.save(feedback);
 

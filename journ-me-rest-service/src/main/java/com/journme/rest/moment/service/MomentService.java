@@ -2,13 +2,17 @@ package com.journme.rest.moment.service;
 
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
+import com.journme.domain.QMomentDetail;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.MomentBaseRepository;
 import com.journme.rest.moment.repository.MomentDetailRepository;
+import com.mysema.query.types.expr.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.ws.rs.core.Response;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author mary_fisher
@@ -47,6 +51,25 @@ public class MomentService {
         }
 
         return moment;
+    }
+
+    public long countAll() {
+        return momentBaseRepository.count();
+    }
+
+    public List<MomentDetail> getMomentsByDate(Date from, Date to) {
+
+        QMomentDetail qMomentDetail = QMomentDetail.momentDetail;
+
+        BooleanExpression criteria = qMomentDetail.isPublic.isTrue();
+        if (from != null) {
+            criteria.and(qMomentDetail.created.after(from));
+        }
+        if (to != null) {
+            criteria.and(qMomentDetail.created.before(to));
+        }
+
+        return (List<MomentDetail>) momentDetailRepository.findAll(criteria, qMomentDetail.created.desc());
     }
 
     private void throwExc(String momentId) {

@@ -2,7 +2,10 @@ package com.journme.rest.journey.repository;
 
 import com.journme.domain.JourneyBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+
+import java.util.List;
 
 /**
  * <h1>DAO repository class</h1>
@@ -14,4 +17,6 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  */
 public interface JourneyBaseRepository extends MongoRepository<JourneyBase, String>, QueryDslPredicateExecutor<JourneyBase> {
 
+    @Query("{$group: {_id: {}, count: {$sum: {$size: { '$ifNull': [ '$linkedFromJourneys', [] ] }}}}}")
+    List<Integer> allLinksCount();
 }

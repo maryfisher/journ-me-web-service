@@ -10,4 +10,5 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @since 28.10.2015
  */
 public interface MomentBaseRepository extends MongoRepository<MomentBase, String>, QueryDslPredicateExecutor<MomentBase> {
+
 }
