@@ -6,7 +6,7 @@ import com.journme.domain.MomentDetail;
 import com.journme.domain.MomentImage;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
-import com.journme.rest.common.resource.AbstractResource.AbstractImageResource;
+import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.util.Constants;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
@@ -23,14 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import javax.imageio.ImageIO;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -40,7 +35,7 @@ import java.util.List;
  */
 @Component
 @Singleton
-public class BlinkResource extends AbstractImageResource {
+public class BlinkResource extends AbstractResource.AbstractImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlinkResource.class);
 
@@ -69,7 +64,7 @@ public class BlinkResource extends AbstractImageResource {
     public Blink createBlink(
             @NotBlank @QueryParam("momentId") String momentId,
             @FormDataParam("file") List<FormDataBodyPart> imageParts,
-            @FormDataParam("blink") FormDataBodyPart blinkPart) throws IOException {
+            @FormDataParam("blink") FormDataBodyPart blinkPart) {
         LOGGER.info("Incoming request to create a new blink under moment {}", momentId);
 
         blinkPart.setMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE);
@@ -81,24 +76,19 @@ public class BlinkResource extends AbstractImageResource {
         if (imageParts != null && !imageParts.isEmpty()) {
             for (FormDataBodyPart imagePart : imageParts) {
                 String imageName = imagePart.getContentDisposition().getFileName();
-                String mimeType = imagePart.getMediaType().toString();
+                MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
+
                 byte[] image = toByteArray(imagePart);
 
                 if (moment.getThumb() == null) {
-                    BufferedImage bImage = createResizedCopy(ImageIO.read(new ByteArrayInputStream(image)), Constants.THUMBNAIL_WIDTH, Constants.THUMBNAIL_HEIGHT, true);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(bImage, "jpg", baos);
-                    baos.flush();
-                    MomentImage momentImage = new MomentImage(imageName, mimeType, null);
-                    momentImage.setThumbnail(baos.toByteArray());
+                    byte[] thumbnail = createResizedCopy(image, mediaType, Constants.THUMBNAIL_SIZE, Constants.THUMBNAIL_SIZE, true, true);
+                    MomentImage momentImage = new MomentImage(imageName, mediaType.toString(), null);
+                    momentImage.setThumbnail(thumbnail);
                     momentImage = momentImageRepository.save(momentImage);
                     moment.setThumb(momentImage);
                 }
 
-                BlinkImage blinkImage = new BlinkImage(imageName, mimeType, image);
-
-                //TODO: generate small resolution image from original image
-
+                BlinkImage blinkImage = new BlinkImage(imageName, mediaType.toString(), image);
                 blinkImage = blinkImageRepository.save(blinkImage);
                 blink.getImages().add(blinkImage);
             }
@@ -122,7 +112,7 @@ public class BlinkResource extends AbstractImageResource {
     public Blink updateBlink(
             @NotBlank @PathParam("blinkId") String blinkId,
             @FormDataParam("file") List<FormDataBodyPart> imageParts,
-            @FormDataParam("blink") FormDataBodyPart blinkPart) throws IOException {
+            @FormDataParam("blink") FormDataBodyPart blinkPart) {
         LOGGER.info("Incoming request to update blink {}", blinkId);
         blinkPart.setMediaType(javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE);
         Blink changedBlink = blinkPart.getValueAs(Blink.class);
@@ -140,20 +130,22 @@ public class BlinkResource extends AbstractImageResource {
             for (FormDataBodyPart imagePart : imageParts) {
                 if (imagePart != null) {
                     String imageName = imagePart.getContentDisposition().getFileName();
-                    String mimeType = imagePart.getMediaType().toString();
+                    MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
                     byte[] image = toByteArray(imagePart);
 
-                    BlinkImage blinkImage = existingBlink.getImages().get(indexCount);
+                    BlinkImage blinkImage = existingBlink.getImages().size() > indexCount ? existingBlink.getImages().get(indexCount) : null;
                     if (blinkImage != null) {
                         // cannot reuse same image entity in DB for new image binary, because browser cached image according to ID
                         blinkRepository.delete(blinkImage.getId());
                     }
-                    blinkImage = new BlinkImage(imageName, mimeType, image);
-
-                    //TODO: generate small resolution image from original image
+                    blinkImage = new BlinkImage(imageName, mediaType.toString(), image);
 
                     blinkImage = blinkImageRepository.save(blinkImage);
-                    existingBlink.getImages().set(indexCount, blinkImage);
+                    if (indexCount >= existingBlink.getImages().size()) {
+                        existingBlink.getImages().add(blinkImage);
+                    } else {
+                        existingBlink.getImages().set(indexCount, blinkImage);
+                    }
                 }
                 indexCount++;
             }

@@ -5,7 +5,8 @@ import com.journme.domain.AliasDetail;
 import com.journme.domain.AliasImage;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
-import com.journme.rest.common.resource.AbstractResource.AbstractImageResource;
+import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.common.util.Constants;
 import com.journme.rest.contract.ImageClassifier;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -28,7 +29,7 @@ import java.io.IOException;
  */
 @Component
 @Singleton
-public class AliasResource extends AbstractImageResource {
+public class AliasResource extends AbstractResource.AbstractImageResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AliasResource.class);
 
@@ -65,16 +66,16 @@ public class AliasResource extends AbstractImageResource {
         byte[] image = toByteArray(imagePart);
         if (image != null && image.length > 0) {
             String imageName = imagePart.getContentDisposition().getFileName();
-            String mimeType = imagePart.getMediaType().toString();
+            MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
 
             AliasImage aliasImage = existingAlias.getImage();
             if (aliasImage != null) {
                 // cannot reuse same image entity in DB for new image binary, because browser cached image according to ID
                 aliasService.deleteImage(aliasImage.getId());
             }
-            aliasImage = new AliasImage(imageName, mimeType, image);
-
-            //TODO: generate small resolution image from original image
+            aliasImage = new AliasImage(imageName, mediaType.toString(), image);
+            byte[] thumbnail = createResizedCopy(image, mediaType, Constants.THUMBNAIL_SIZE, Constants.THUMBNAIL_SIZE, true, true);
+            aliasImage.setThumbnail(thumbnail);
 
             aliasImage = aliasService.save(aliasImage);
             changedAlias.setImage(aliasImage);
