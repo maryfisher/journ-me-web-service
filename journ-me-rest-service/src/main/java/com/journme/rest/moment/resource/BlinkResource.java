@@ -7,6 +7,7 @@ import com.journme.domain.MomentImage;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource.AbstractImageResource;
+import com.journme.rest.common.util.Constants;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.BlinkImageRepository;
@@ -84,7 +85,7 @@ public class BlinkResource extends AbstractImageResource {
                 byte[] image = toByteArray(imagePart);
 
                 if (moment.getThumb() == null) {
-                    BufferedImage bImage = createResizedCopy(ImageIO.read(new ByteArrayInputStream(image)), 40, 40, true);
+                    BufferedImage bImage = createResizedCopy(ImageIO.read(new ByteArrayInputStream(image)), Constants.THUMBNAIL_WIDTH, Constants.THUMBNAIL_HEIGHT, true);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(bImage, "jpg", baos);
                     baos.flush();

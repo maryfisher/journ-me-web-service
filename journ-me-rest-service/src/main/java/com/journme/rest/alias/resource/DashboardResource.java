@@ -3,6 +3,7 @@ package com.journme.rest.alias.resource;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.common.util.Constants;
 import com.journme.rest.contract.alias.DashboardRequest;
 import com.journme.rest.contract.alias.DashboardResponse;
 import com.journme.rest.moment.service.FeedbackService;
@@ -40,9 +41,8 @@ public class DashboardResource extends AbstractResource {
         DashboardResponse response = new DashboardResponse();
         response.setRecentFeedback(
                 feedbackService.getFeedbackByDate(request.getAliasId(),
-                        new Date(new Date().getTime() - 2 * 14 * 24 * 60 * 60 * 1000L),
-                        null));
-
+                        new Date(new Date().getTime() - Constants.TWO_WEEKS_MILLISEC))
+                        .getContent());
         return response;
     }
 }
