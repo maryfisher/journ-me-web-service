@@ -1,12 +1,16 @@
 package com.journme.rest.moment.service;
 
 import com.journme.domain.Feedback;
+import com.journme.domain.QFeedback;
 import com.journme.rest.moment.repository.FeedbackRepository;
+import com.mysema.query.types.path.DateTimePath;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author mary_fisher
@@ -17,7 +21,8 @@ public class FeedbackService {
     @Autowired
     private FeedbackRepository feedbackRepository;
 
-    public List<Feedback> getFeedbackByDate(String aliasId, Date from, Date to) {
-        return feedbackRepository.findRecent(new ObjectId(aliasId), from);
+    public Page<Feedback> getFeedbackByDate(String aliasId, Date from) {
+        DateTimePath<Date> qCreated = QFeedback.feedback.created;
+        return feedbackRepository.findRecent(new ObjectId(aliasId), from, new PageRequest(0, 10, Direction.DESC, qCreated.getMetadata().getName()));
     }
 }

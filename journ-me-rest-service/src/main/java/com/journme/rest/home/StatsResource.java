@@ -52,8 +52,8 @@ public class StatsResource {
 
         long twoWeeks = 2 * 14 * 24 * 60 * 60 * 1000L;
         Date date = new Date(new Date().getTime() - twoWeeks);
-        response.setRecentMoments(momentService.getMomentsByDate(date, null));
-        response.setRecentJourneys(journeyService.getJourneysByDate(date, null));
+        response.setRecentMoments(momentService.getMomentsByDate(date, null).getContent());
+        response.setRecentJourneys(journeyService.getJourneysByDate(date, null).getContent());
 
         return response;
     }

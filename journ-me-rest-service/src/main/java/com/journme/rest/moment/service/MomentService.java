@@ -8,11 +8,14 @@ import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.repository.MomentBaseRepository;
 import com.journme.rest.moment.repository.MomentDetailRepository;
 import com.mysema.query.types.expr.BooleanExpression;
+import com.mysema.query.types.path.DateTimePath;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 
 import javax.ws.rs.core.Response;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author mary_fisher
@@ -57,19 +60,18 @@ public class MomentService {
         return momentBaseRepository.count();
     }
 
-    public List<MomentDetail> getMomentsByDate(Date from, Date to) {
+    public Page<MomentDetail> getMomentsByDate(Date from, Date to) {
+        DateTimePath<Date> qCreated = QMomentDetail.momentDetail.created;
 
-        QMomentDetail qMomentDetail = QMomentDetail.momentDetail;
-
-        BooleanExpression criteria = qMomentDetail.isPublic.isTrue();
+        BooleanExpression criteria = QMomentDetail.momentDetail.isPublic.isTrue();
         if (from != null) {
-            criteria.and(qMomentDetail.created.after(from));
+            criteria.and(qCreated.after(from));
         }
         if (to != null) {
-            criteria.and(qMomentDetail.created.before(to));
+            criteria.and(qCreated.before(to));
         }
 
-        return (List<MomentDetail>) momentDetailRepository.findAll(criteria, qMomentDetail.created.desc());
+        return momentDetailRepository.findAll(criteria, new PageRequest(0, 10, Direction.DESC, qCreated.getMetadata().getName()));
     }
 
     private void throwExc(String momentId) {

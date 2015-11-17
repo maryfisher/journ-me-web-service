@@ -8,11 +8,14 @@ import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.repository.JourneyBaseRepository;
 import com.journme.rest.journey.repository.JourneyDetailsRepository;
 import com.mysema.query.BooleanBuilder;
+import com.mysema.query.types.path.DateTimePath;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 
 import javax.ws.rs.core.Response;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author mary_fisher
@@ -57,19 +60,18 @@ public class JourneyService {
         return journeyBaseRepository.count();
     }
 
-    public List<JourneyBase> getJourneysByDate(Date from, Date to) {
-
-        QJourneyBase journey = QJourneyBase.journeyBase;
+    public Page<JourneyBase> getJourneysByDate(Date from, Date to) {
+        DateTimePath<Date> qCreated = QJourneyBase.journeyBase.created;
 
         BooleanBuilder criteria = new BooleanBuilder();
         if (from != null) {
-            criteria.and(journey.created.after(from));
+            criteria.and(qCreated.after(from));
         }
         if (to != null) {
-            criteria.and(journey.created.before(to));
+            criteria.and(qCreated.before(to));
         }
 
-        return (List<JourneyBase>) journeyBaseRepository.findAll(criteria, journey.created.desc());
+        return journeyBaseRepository.findAll(criteria, new PageRequest(0, 20, Direction.DESC, qCreated.getMetadata().getName()));
     }
 
     private void thowJourneyExc(String journeyId) {
