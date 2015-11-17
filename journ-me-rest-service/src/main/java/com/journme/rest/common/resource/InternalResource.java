@@ -1,8 +1,8 @@
 package com.journme.rest.common.resource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.google.gson.Gson;
 import com.journme.domain.Category;
 import com.journme.domain.State;
 import com.journme.rest.common.util.Constants;
@@ -18,6 +18,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
@@ -34,8 +36,6 @@ public class InternalResource {
     @Autowired
     private StateRepository stateRepository;
 
-    private Gson gson = new Gson();
-
     @GET
     @Path("/monitoring/healthchecks")
     public String getHealthcheck() {
@@ -46,7 +46,11 @@ public class InternalResource {
     @GET
     @Path("/config/jm-config.js")
     @Produces("application/javascript")
-    public String getConfig() throws IOException {
+    public String getConfig(@Context Providers providers) throws IOException {
+        ObjectMapper objectMapper = providers
+                .getContextResolver(ObjectMapper.class, javax.ws.rs.core.MediaType.WILDCARD_TYPE)
+                .getContext(ObjectMapper.class);
+
         URL url = Resources.getResource(Constants.Templates.JM_CONFIG_FILE);
         String templateText = Resources.toString(url, Charsets.UTF_8);
 
@@ -59,8 +63,8 @@ public class InternalResource {
 
         List<State> states = stateRepository.findAll();
 
-        String categoriesJson = gson.toJson(categories);
-        String statesJson = gson.toJson(states);
+        String categoriesJson = objectMapper.writeValueAsString(categories);
+        String statesJson = objectMapper.writeValueAsString(states);
 
         templateText = templateText.replace("${categoriesObject}", categoriesJson);
         templateText = templateText.replace("${statesObject}", statesJson);
