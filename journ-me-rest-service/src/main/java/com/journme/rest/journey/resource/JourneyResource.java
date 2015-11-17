@@ -7,6 +7,7 @@ import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.journey.service.CategoryTopicService;
 import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -38,6 +39,9 @@ public class JourneyResource extends AbstractResource {
     @Autowired
     private AliasService aliasService;
 
+    @Autowired
+    private CategoryTopicService categoryTopicService;
+
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
@@ -56,6 +60,10 @@ public class JourneyResource extends AbstractResource {
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
         journey.setAlias(aliasBase);
         journey.setId(null); //ensures that new Journey is created in the collection
+
+        journey.setCategories(categoryTopicService.toValidCategory(journey.getCategories()));
+        journey.setTopics(categoryTopicService.toValidTopic(journey.getTopics(), journey.getCategories()));
+
         journey = journeyService.save(journey);
 
         aliasDetail.getJourneys().add(journey);
@@ -74,8 +82,11 @@ public class JourneyResource extends AbstractResource {
 
         JourneyDetails existingJourney = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(existingJourney.getAlias().getId());
-        existingJourney.copy(changedJourney);
 
+        changedJourney.setCategories(categoryTopicService.toValidCategory(changedJourney.getCategories()));
+        changedJourney.setTopics(categoryTopicService.toValidTopic(changedJourney.getTopics(), changedJourney.getCategories()));
+
+        existingJourney.copy(changedJourney);
         existingJourney = journeyService.save(existingJourney);
         return changedJourney.copyAll(existingJourney);
     }

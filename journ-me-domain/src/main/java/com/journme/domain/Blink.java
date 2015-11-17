@@ -21,16 +21,6 @@ import java.util.List;
 @Document(collection = "blink")
 public class Blink extends AbstractEntity {
 
-    public enum BlinkFormat {
-        RIGHT_IMAGE,
-        LEFT_IMAGE,
-        DOUBLE_TEXT,
-        SINGLE_TEXT,
-        VIDEO,
-        SINGLE_IMAGE,
-        DOUBLE_IMAGE
-    }
-
     @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
     private BlinkFormat format = BlinkFormat.RIGHT_IMAGE;
 
@@ -136,5 +126,15 @@ public class Blink extends AbstractEntity {
         }
 
         return this;
+    }
+
+    public enum BlinkFormat {
+        RIGHT_IMAGE,
+        LEFT_IMAGE,
+        DOUBLE_TEXT,
+        SINGLE_TEXT,
+        VIDEO,
+        SINGLE_IMAGE,
+        DOUBLE_IMAGE
     }
 }

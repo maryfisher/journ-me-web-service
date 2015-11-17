@@ -18,6 +18,7 @@ import java.util.List;
  */
 @Component
 @Singleton
+@Deprecated
 public class StateResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StateResource.class);

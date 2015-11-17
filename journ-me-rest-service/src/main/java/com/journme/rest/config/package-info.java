@@ -18,6 +18,7 @@
         MomentDetail.class,
         MomentImage.class,
         State.class,
+        Topic.class,
         User.class
 })
 package com.journme.rest.config;

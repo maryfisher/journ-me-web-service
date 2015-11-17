@@ -2,8 +2,13 @@ package com.journme.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import javax.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <h1>Domain class/persistence entity</h1>
@@ -15,12 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "journey")
 public class JourneyBase extends AbstractEntity {
-
-    public enum JoinType {
-        ALL,
-        SELECTED,
-        NONE
-    }
 
     @NotBlank
     private String name;
@@ -34,6 +33,14 @@ public class JourneyBase extends AbstractEntity {
     private JoinType join = JoinType.NONE;
 
     private Boolean isPublic = Boolean.TRUE;
+
+    @Indexed
+    @NotNull
+    private Set<String> categories = new HashSet<>();
+
+    @Indexed
+    @NotNull
+    private Set<String> topics = new HashSet<>();
 
     public String getName() {
         return name;
@@ -75,6 +82,22 @@ public class JourneyBase extends AbstractEntity {
         this.isPublic = isPublic;
     }
 
+    public Set<String> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<String> categories) {
+        this.categories = categories;
+    }
+
+    public Set<String> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(Set<String> topics) {
+        this.topics = topics;
+    }
+
     public JourneyBase copy(JourneyBase other) {
         if (other.name != null) {
             this.name = other.name;
@@ -91,6 +114,12 @@ public class JourneyBase extends AbstractEntity {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
+        if (other.categories != null) {
+            this.categories = other.categories;
+        }
+        if (other.topics != null) {
+            this.topics = other.topics;
+        }
         return this;
     }
 
@@ -98,5 +127,11 @@ public class JourneyBase extends AbstractEntity {
         super.copyAll(other);
         copy(other);
         return this;
+    }
+
+    public enum JoinType {
+        ALL,
+        SELECTED,
+        NONE
     }
 }

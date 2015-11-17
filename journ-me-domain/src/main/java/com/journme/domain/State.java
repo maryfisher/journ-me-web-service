@@ -11,14 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "state")
 public class State extends AbstractIdEntity {
 
-    public enum StateType {
-        FEELING,
-        NEUTRAL_FEELING,
-        BAD_FEELING,
-        NEED,
-        OPEN_NEED
-    }
-
     @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
     private StateType type;
 
@@ -38,5 +30,13 @@ public class State extends AbstractIdEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public enum StateType {
+        FEELING,
+        NEUTRAL_FEELING,
+        BAD_FEELING,
+        NEED,
+        OPEN_NEED
     }
 }
