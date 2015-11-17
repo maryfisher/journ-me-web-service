@@ -29,6 +29,8 @@
         <querydsl>3.6.9</querydsl>
         <!-- Overwriting version in querydsl-mongodb -->
         <morphia.version>1.0.1</morphia.version>
+        <!-- Overwriting version in querydsl-root -->
+        <guava.version>18.0</guava.version>
 
         <!-- Cannot upgrade to Querydsl 4 as long as QueryDslPredicateExecutor (spring-data-commons) uses Predicate from Querydsl 3 -->
         <!--<querydsl.version>4.0.6</querydsl.version>-->

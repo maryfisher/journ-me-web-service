@@ -1,6 +1,7 @@
 package com.journme.rest;
 
 import com.journme.rest.alias.resource.AliasResource;
+import com.journme.rest.common.resource.InternalResource;
 import com.journme.rest.home.StatsResource;
 import com.journme.rest.journey.resource.JourneyResource;
 import com.journme.rest.moment.resource.BlinkResource;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
@@ -37,11 +37,9 @@ public class RootResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RootResource.class);
 
-    @GET
-    @Path("/internal/monitoring/healthchecks")
-    public String getHealthcheck() {
-        LOGGER.debug("Incoming healthcheck call");
-        return "{'status':'OK','message':'OK!'}";
+    @Path("/internal")
+    public Class<InternalResource> getInternalResource() {
+        return InternalResource.class;
     }
 
     @Path("/journey")
