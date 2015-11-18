@@ -2,6 +2,7 @@
 // Note that all entities need to be annotated with org.mongodb.morphia.annotations.Entity, which can
 // be simply achieved by annotating com.journme.domain.AbstractEntity (from which all are subclassing)
 @QueryEntities(value = {
+        AbstractIdEntity.class,
         AbstractEntity.class,
         AbstractEntity.AbstractImageEntity.class,
         AliasBase.class,

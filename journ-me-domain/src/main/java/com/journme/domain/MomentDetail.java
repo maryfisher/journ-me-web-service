@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EmptyArrayConverter;
 import com.journme.domain.converter.EntityToIdSerializer;
+import com.journme.domain.converter.StateListConverter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
@@ -16,7 +17,9 @@ import java.util.List;
  */
 public class MomentDetail extends MomentBase {
 
-    @DBRef
+    @DBRef(lazy = true)
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(converter = StateListConverter.class)
     private List<State> states = new ArrayList<>();
 
     @DBRef

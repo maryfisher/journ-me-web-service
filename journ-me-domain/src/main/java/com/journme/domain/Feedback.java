@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EntityToIdSerializer;
 import com.journme.domain.converter.NullConverter;
+import com.journme.domain.converter.StateListConverter;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,8 +41,10 @@ public class Feedback extends AbstractEntity {
     @NotBlank
     private String body;
 
-    @DBRef
-    private List<State> states;
+    @DBRef(lazy = true)
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(converter = StateListConverter.class)
+    private List<State> states = new ArrayList<>();
 
     public AliasBase getAlias() {
         return alias;

@@ -5,8 +5,9 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.journme.domain.Category;
 import com.journme.domain.State;
+import com.journme.domain.repository.StateRepository;
 import com.journme.rest.common.util.Constants;
-import com.journme.rest.state.repository.StateRepository;
+import com.journme.rest.config.JerseyConfig.ObjectMapperWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class InternalResource {
     @Autowired
     private StateRepository stateRepository;
 
+    @Autowired
+    private ObjectMapperWrapper objectMapperWrapper;
+
     @GET
     @Path("/monitoring/healthchecks")
     public String getHealthcheck() {
@@ -47,9 +51,7 @@ public class InternalResource {
     @Path("/config/jm-config.js")
     @Produces("application/javascript")
     public String getConfig(@Context Providers providers) throws IOException {
-        ObjectMapper objectMapper = providers
-                .getContextResolver(ObjectMapper.class, javax.ws.rs.core.MediaType.WILDCARD_TYPE)
-                .getContext(ObjectMapper.class);
+        ObjectMapper objectMapper = objectMapperWrapper.getObjectMapper();
 
         URL url = Resources.getResource(Constants.Templates.JM_CONFIG_FILE);
         String templateText = Resources.toString(url, Charsets.UTF_8);

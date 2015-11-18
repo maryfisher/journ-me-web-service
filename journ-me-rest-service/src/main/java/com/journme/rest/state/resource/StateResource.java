@@ -1,7 +1,7 @@
 package com.journme.rest.state.resource;
 
 import com.journme.domain.State;
-import com.journme.rest.state.repository.StateRepository;
+import com.journme.domain.repository.StateRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
