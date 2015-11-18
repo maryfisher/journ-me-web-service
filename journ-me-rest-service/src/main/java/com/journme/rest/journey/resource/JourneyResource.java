@@ -42,6 +42,11 @@ public class JourneyResource extends AbstractResource {
     @Autowired
     private CategoryTopicService categoryTopicService;
 
+    @Path("/topic")
+    public Class<TopicResource> getTopicResource() {
+        return TopicResource.class;
+    }
+
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {

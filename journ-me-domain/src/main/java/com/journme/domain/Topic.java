@@ -12,6 +12,10 @@ public class Topic extends AbstractEntity {
     @Indexed
     private String tag;
 
+    @Indexed
+    private Integer count = 0;
+
+    // Need to add sparse index to collection manually via MongoDB
     private Map<String, Double> categoryWeight = new HashMap<>();
 
     public Topic() {
@@ -19,6 +23,14 @@ public class Topic extends AbstractEntity {
 
     public Topic(String tag) {
         this.tag = tag;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 
     public String getTag() {
@@ -35,5 +47,9 @@ public class Topic extends AbstractEntity {
 
     public void setCategoryWeight(Map<String, Double> categoryWeight) {
         this.categoryWeight = categoryWeight;
+    }
+
+    public Integer incrementCount() {
+        return ++count;
     }
 }

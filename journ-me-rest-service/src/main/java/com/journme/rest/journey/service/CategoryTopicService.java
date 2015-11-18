@@ -1,11 +1,18 @@
 package com.journme.rest.journey.service;
 
 import com.journme.domain.Category;
+import com.journme.domain.QTopic;
 import com.journme.domain.Topic;
+import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.domain.repository.CategoryRepository;
 import com.journme.domain.repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 
+import javax.ws.rs.core.Response.Status;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,15 +26,33 @@ public class CategoryTopicService {
 
     private Set<String> categoriesCache;
 
+    public Page<Topic> getTopicByCategory(String category) {
+        return topicRepository.findAll(new PageRequest(0, 100, Direction.DESC,
+                QTopic.topic.categoryWeight.getMetadata().getName() + "." + category));
+    }
+
+    public String toValidCategory(String inputCategory) {
+        if (getSupportedCategories().contains(inputCategory)) {
+            return inputCategory;
+        } else {
+            throw new JournMeException("Unsupported journey category " + inputCategory,
+                    Status.BAD_REQUEST,
+                    ExceptionCode.CLIENT_SERVER_PROBLEM);
+        }
+    }
+
     public Set<String> toValidCategory(Set<String> inputCategories) {
         Set<String> supportedCategories = getSupportedCategories();
-        Iterator<String> iterator = inputCategories.iterator();
-        while (iterator.hasNext()) {
-            if (!supportedCategories.contains(iterator.next())) {
-                iterator.remove();
-            }
+        Set<String> validCategories = new HashSet<>(inputCategories.size());
+        validCategories.addAll(inputCategories.stream().filter(supportedCategories::contains).collect(Collectors.toList()));
+
+        if (validCategories.isEmpty()) {
+            throw new JournMeException("Unsupported journey categories " + inputCategories,
+                    Status.BAD_REQUEST,
+                    ExceptionCode.CLIENT_SERVER_PROBLEM);
+        } else {
+            return inputCategories;
         }
-        return inputCategories;
     }
 
     public Set<String> toValidTopic(Set<String> inputTopics, Set<String> inputCategories) {
@@ -43,6 +68,7 @@ public class CategoryTopicService {
                 weight = weight != null ? weight + 1.0D : 1.0D;
                 topic.getCategoryWeight().put(categoryName, weight);
             }
+            topic.incrementCount();
             topicRepository.save(topic);
         }
 
