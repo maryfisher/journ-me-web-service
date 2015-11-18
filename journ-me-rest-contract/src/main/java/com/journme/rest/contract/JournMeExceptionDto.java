@@ -13,6 +13,7 @@ import java.util.Map;
 public class JournMeExceptionDto {
 
     private final String code;
+
     private Map<String, Object> interpolationMap;
 
     public JournMeExceptionDto(ExceptionCode code) {

@@ -24,4 +24,13 @@ public abstract class Constants {
     private Constants() {
     }
 
+    public static abstract class Templates {
+
+        public static String JM_CONFIG_FILE = "templates/jm-config.tpl.js";
+
+        private Templates() {
+        }
+
+    }
+
 }

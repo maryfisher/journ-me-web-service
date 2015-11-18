@@ -7,7 +7,7 @@ import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.repository.JourneyBaseRepository;
 import com.journme.rest.journey.repository.JourneyDetailsRepository;
-import com.mysema.query.BooleanBuilder;
+import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.path.DateTimePath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,7 +63,7 @@ public class JourneyService {
     public Page<JourneyBase> getJourneysByDate(Date from, Date to) {
         DateTimePath<Date> qCreated = QJourneyBase.journeyBase.created;
 
-        BooleanBuilder criteria = new BooleanBuilder();
+        BooleanExpression criteria = QJourneyBase.journeyBase.isPublic.isTrue();
         if (from != null) {
             criteria.and(qCreated.after(from));
         }
