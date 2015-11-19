@@ -2,7 +2,7 @@ package com.journme.rest.home;
 
 import com.journme.rest.contract.stats.StatsResponse;
 import com.journme.rest.journey.service.JourneyService;
-import com.journme.rest.moment.repository.FeedbackRepository;
+import com.journme.domain.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

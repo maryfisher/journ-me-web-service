@@ -1,4 +1,4 @@
-package com.journme.rest.moment.repository;
+package com.journme.domain.repository;
 
 import com.journme.domain.BlinkImage;
 import org.springframework.data.mongodb.repository.MongoRepository;

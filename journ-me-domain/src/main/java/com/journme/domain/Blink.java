@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EmptyArrayConverter;
 import com.journme.domain.converter.EntityToIdSerializer;
 import com.journme.domain.converter.NullConverter;
+import com.journme.domain.converter.StateListConverter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -49,8 +50,9 @@ public class Blink extends AbstractEntity {
 
     private Integer ratio = 48;
 
-    //TODO: render states from DB into HTML as Angular module configuration
-    @DBRef
+    @DBRef(lazy = true)
+    @JsonSerialize(contentUsing = EntityToIdSerializer.class)
+    @JsonDeserialize(converter = StateListConverter.class)
     private List<State> states = new ArrayList<>();
 
     public BlinkFormat getFormat() {

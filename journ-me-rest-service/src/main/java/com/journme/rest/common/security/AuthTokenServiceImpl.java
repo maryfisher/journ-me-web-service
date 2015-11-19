@@ -7,17 +7,9 @@
 package com.journme.rest.common.security;
 
 import com.journme.domain.User;
+import com.journme.domain.repository.UserRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
-import com.journme.rest.user.repository.UserRepository;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.NoSuchElementException;
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -25,6 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.ws.rs.core.Response;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.NoSuchElementException;
 
 public class AuthTokenServiceImpl implements AuthTokenService {
 

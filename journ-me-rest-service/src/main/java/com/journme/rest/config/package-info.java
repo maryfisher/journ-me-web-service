@@ -2,6 +2,7 @@
 // Note that all entities need to be annotated with org.mongodb.morphia.annotations.Entity, which can
 // be simply achieved by annotating com.journme.domain.AbstractEntity (from which all are subclassing)
 @QueryEntities(value = {
+        AbstractIdEntity.class,
         AbstractEntity.class,
         AbstractEntity.AbstractImageEntity.class,
         AliasBase.class,
@@ -9,6 +10,7 @@
         AliasImage.class,
         Blink.class,
         BlinkImage.class,
+        Category.class,
         Feedback.class,
         JourneyBase.class,
         JourneyDetails.class,
@@ -17,7 +19,8 @@
         MomentImage.class,
         State.class,
         User.class
-}) package com.journme.rest.config;
+})
+package com.journme.rest.config;
 
 import com.journme.domain.*;
 import com.mysema.query.annotations.QueryEntities;

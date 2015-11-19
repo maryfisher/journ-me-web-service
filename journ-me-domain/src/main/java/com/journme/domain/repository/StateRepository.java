@@ -1,6 +1,6 @@
-package com.journme.rest.moment.repository;
+package com.journme.domain.repository;
 
-import com.journme.domain.MomentBase;
+import com.journme.domain.State;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
@@ -9,6 +9,5 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @version 1.0
  * @since 28.10.2015
  */
-public interface MomentBaseRepository extends MongoRepository<MomentBase, String>, QueryDslPredicateExecutor<MomentBase> {
-
+public interface StateRepository extends MongoRepository<State, String>, QueryDslPredicateExecutor<State> {
 }

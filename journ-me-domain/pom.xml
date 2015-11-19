@@ -33,6 +33,11 @@
             <artifactId>morphia</artifactId>
             <version>${morphia.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.mysema.querydsl</groupId>
+            <artifactId>querydsl-core</artifactId>
+            <version>${querydsl}</version>
+        </dependency>
     </dependencies>
 
 </project>

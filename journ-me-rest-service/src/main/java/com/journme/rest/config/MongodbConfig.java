@@ -27,7 +27,7 @@ import static java.util.Collections.singletonList;
  */
 @Configuration
 @EnableMongoAuditing
-@EnableMongoRepositories(basePackageClasses = {com.journme.rest.Application.class})
+@EnableMongoRepositories(basePackageClasses = {com.journme.domain.AbstractEntity.class})
 public class MongodbConfig extends AbstractMongoConfiguration {
 
     @Value("${mongodb.host:localhost}")

@@ -2,7 +2,7 @@ package com.journme.rest.moment.service;
 
 import com.journme.domain.Feedback;
 import com.journme.domain.QFeedback;
-import com.journme.rest.moment.repository.FeedbackRepository;
+import com.journme.domain.repository.FeedbackRepository;
 import com.mysema.query.types.path.DateTimePath;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

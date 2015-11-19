@@ -17,23 +17,12 @@ import java.util.List;
 public class MomentDetail extends MomentBase {
 
     @DBRef
-    private List<State> states = new ArrayList<>();
-
-    @DBRef
     private List<Feedback> feedback = new ArrayList<>();
 
     @DBRef(lazy = true)
     @JsonSerialize(contentUsing = EntityToIdSerializer.class)
     @JsonDeserialize(converter = EmptyArrayConverter.class)
     private List<Blink> blinks = new ArrayList<>();
-
-    public List<State> getStates() {
-        return states;
-    }
-
-    public void setStates(List<State> states) {
-        this.states = states;
-    }
 
     public List<Feedback> getFeedback() {
         return feedback;

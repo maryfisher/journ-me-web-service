@@ -1,8 +1,6 @@
 package com.journme.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.mongodb.morphia.annotations.Entity;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,9 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * @version 1.0
  * @since 28.10.2015
  */
-@Entity
 @Document(collection = "state")
-public class State {
+public class State extends AbstractIdEntity {
 
     public enum StateType {
         FEELING,
@@ -22,21 +19,10 @@ public class State {
         OPEN_NEED
     }
 
-    @Id
-    private String id;
-
     @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
     private StateType type;
 
     private String name;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public StateType getType() {
         return type;
