@@ -7,7 +7,7 @@ import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.service.JourneyService;
-import com.journme.rest.moment.repository.MomentImageRepository;
+import com.journme.domain.repository.MomentImageRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;

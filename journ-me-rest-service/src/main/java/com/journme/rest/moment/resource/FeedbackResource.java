@@ -6,7 +6,7 @@ import com.journme.domain.MomentDetail;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
-import com.journme.rest.moment.repository.FeedbackRepository;
+import com.journme.domain.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;

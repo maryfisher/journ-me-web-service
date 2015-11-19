@@ -1,4 +1,4 @@
-package com.journme.rest.alias.repository;
+package com.journme.domain.repository;
 
 import com.journme.domain.AliasBase;
 import org.springframework.data.mongodb.repository.MongoRepository;

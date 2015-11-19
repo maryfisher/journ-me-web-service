@@ -2,7 +2,7 @@ package com.journme.rest.user.resource;
 
 import com.journme.domain.AliasBase;
 import com.journme.domain.User;
-import com.journme.rest.alias.repository.AliasBaseRepository;
+import com.journme.domain.repository.AliasBaseRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
@@ -12,7 +12,7 @@ import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.contract.user.LoginRequest;
 import com.journme.rest.contract.user.LoginResponse;
 import com.journme.rest.contract.user.RegisterRequest;
-import com.journme.rest.user.repository.UserRepository;
+import com.journme.domain.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

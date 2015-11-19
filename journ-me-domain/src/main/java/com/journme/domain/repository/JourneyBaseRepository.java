@@ -1,4 +1,4 @@
-package com.journme.rest.journey.repository;
+package com.journme.domain.repository;
 
 import com.journme.domain.JourneyBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
