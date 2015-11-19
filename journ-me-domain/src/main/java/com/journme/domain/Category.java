@@ -15,6 +15,12 @@ public class Category extends AbstractIdEntity {
 
     private Boolean isActive = Boolean.TRUE;
 
+    @Override
+    public String getId() {
+        // Jackson uses getter during serialization - make FrontEnd work with category code as the ID
+        return code;
+    }
+
     public String getCode() {
         return code;
     }

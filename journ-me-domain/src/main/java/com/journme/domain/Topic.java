@@ -1,6 +1,7 @@
 package com.journme.domain;
 
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Map;
 @Document(collection = "topic")
 public class Topic extends AbstractEntity {
 
-    @Indexed
+    @TextIndexed
     private String tag;
 
     @Indexed
@@ -23,6 +24,12 @@ public class Topic extends AbstractEntity {
 
     public Topic(String tag) {
         this.tag = tag;
+    }
+
+    @Override
+    public String getId() {
+        // Jackson uses getter during serialization - make FrontEnd work with topic tag as the ID
+        return tag;
     }
 
     public Integer getCount() {

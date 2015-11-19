@@ -2,10 +2,15 @@ package com.journme.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.validator.constraints.NotBlank;
+import org.mongodb.morphia.annotations.Entity;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,8 +27,10 @@ import java.util.Set;
 public class JourneyBase extends AbstractEntity {
 
     @NotBlank
+    @TextIndexed
     private String name;
 
+    @TextIndexed
     private String descript;
 
     @DBRef(lazy = true)
@@ -34,9 +41,9 @@ public class JourneyBase extends AbstractEntity {
 
     private Boolean isPublic = Boolean.TRUE;
 
-    @Indexed
     @NotNull
-    private Set<String> categories = new HashSet<>();
+    @Valid
+    private Set<CategoryWeight> categoryWeights = new HashSet<>();
 
     @Indexed
     @NotNull
@@ -82,12 +89,12 @@ public class JourneyBase extends AbstractEntity {
         this.isPublic = isPublic;
     }
 
-    public Set<String> getCategories() {
-        return categories;
+    public Set<CategoryWeight> getCategoryWeights() {
+        return categoryWeights;
     }
 
-    public void setCategories(Set<String> categories) {
-        this.categories = categories;
+    public void setCategoryWeights(Set<CategoryWeight> categoryWeights) {
+        this.categoryWeights = categoryWeights;
     }
 
     public Set<String> getTopics() {
@@ -114,8 +121,8 @@ public class JourneyBase extends AbstractEntity {
         if (other.isPublic != null) {
             this.isPublic = other.isPublic;
         }
-        if (other.categories != null) {
-            this.categories = other.categories;
+        if (other.categoryWeights != null) {
+            this.categoryWeights = other.categoryWeights;
         }
         if (other.topics != null) {
             this.topics = other.topics;
@@ -133,5 +140,47 @@ public class JourneyBase extends AbstractEntity {
         ALL,
         SELECTED,
         NONE
+    }
+
+    @Entity
+    public static class CategoryWeight {
+        @NotBlank
+        private String category;
+
+        @NotNull
+        @Min(0)
+        @Max(100)
+        private Double weight;
+
+        public String getCategory() {
+            return category;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public Double getWeight() {
+            return weight;
+        }
+
+        public void setWeight(Double weight) {
+            this.weight = weight;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return this == other || category != null && other instanceof CategoryWeight && category.equals(((CategoryWeight) other).category);
+        }
+
+        @Override
+        public int hashCode() {
+            return category != null ? category.hashCode() : 0;
+        }
+
+        @Override
+        public String toString() {
+            return category;
+        }
     }
 }

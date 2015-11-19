@@ -1,12 +1,13 @@
 package com.journme.rest.journey.service;
 
 import com.journme.domain.Category;
+import com.journme.domain.JourneyBase.CategoryWeight;
 import com.journme.domain.QTopic;
 import com.journme.domain.Topic;
-import com.journme.rest.common.errorhandling.JournMeException;
-import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import com.journme.domain.repository.CategoryRepository;
 import com.journme.domain.repository.TopicRepository;
+import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,21 +42,21 @@ public class CategoryTopicService {
         }
     }
 
-    public Set<String> toValidCategory(Set<String> inputCategories) {
+    public Set<CategoryWeight> toValidCategoryWeight(Set<CategoryWeight> categoryWeights) {
         Set<String> supportedCategories = getSupportedCategories();
-        Set<String> validCategories = new HashSet<>(inputCategories.size());
-        validCategories.addAll(inputCategories.stream().filter(supportedCategories::contains).collect(Collectors.toList()));
+        Set<CategoryWeight> validCategoryWeights = new HashSet<>(categoryWeights.size());
+        validCategoryWeights.addAll(categoryWeights.stream().filter(categoryWeight -> supportedCategories.contains(categoryWeight.getCategory())).collect(Collectors.toList()));
 
-        if (validCategories.isEmpty()) {
-            throw new JournMeException("Unsupported journey categories " + inputCategories,
+        if (validCategoryWeights.isEmpty()) {
+            throw new JournMeException("Unsupported journey categories " + categoryWeights,
                     Status.BAD_REQUEST,
                     ExceptionCode.CLIENT_SERVER_PROBLEM);
         } else {
-            return inputCategories;
+            return validCategoryWeights;
         }
     }
 
-    public Set<String> toValidTopic(Set<String> inputTopics, Set<String> inputCategories) {
+    public Set<String> toValidTopic(Set<String> inputTopics, Set<CategoryWeight> categoryWeights) {
         //TODO: this can be improved by batching DB access rather than accessing during a loop
         for (String topicTag : inputTopics) {
             Topic topic = topicRepository.findByTag(topicTag);
@@ -63,9 +64,10 @@ public class CategoryTopicService {
                 topic = new Topic(topicTag);
             }
 
-            for (String categoryName : inputCategories) {
+            for (CategoryWeight categoryWeight : categoryWeights) {
+                String categoryName = categoryWeight.getCategory();
                 Double weight = topic.getCategoryWeight().get(categoryName);
-                weight = weight != null ? weight + 1.0D : 1.0D;
+                weight = weight != null ? (weight + categoryWeight.getWeight() / 100.0D) : 1.0D;
                 topic.getCategoryWeight().put(categoryName, weight);
             }
             topic.incrementCount();
@@ -76,6 +78,7 @@ public class CategoryTopicService {
     }
 
     private Set<String> getSupportedCategories() {
+        // TODO: potential to cache the list of categories for a certain amount of time (since Admins won't change categories that often)
         if (categoriesCache == null) {
             List<Category> categoryList = categoryRepository.findAll();
             List<String> categoryStrList = new ArrayList<>(categoryList.size());
