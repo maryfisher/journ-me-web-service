@@ -95,6 +95,7 @@ public class JerseyConfig extends ResourceConfig {
         public ObjectMapperWrapper(ObjectMapper om, ApplicationContext ac) {
             om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            om.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
             om.configure(MapperFeature.USE_STATIC_TYPING, true);
 
             // Exchange Handler Instantiator so that Jackson converters are also handled

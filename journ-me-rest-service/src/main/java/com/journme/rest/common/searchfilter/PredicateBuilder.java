@@ -4,18 +4,19 @@ import com.journme.domain.QJourneyDetails;
 import com.journme.rest.common.searchfilter.SearchFilter.CollectionMatch;
 import com.journme.rest.common.searchfilter.SearchFilter.ElementMatch;
 import com.journme.rest.common.searchfilter.SearchFilter.TextMatch;
+import com.journme.rest.common.util.Constants;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.types.Predicate;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.ComparableExpressionBase;
 import com.mysema.query.types.expr.StringExpression;
 import com.mysema.query.types.path.CollectionPathBase;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 
 public abstract class PredicateBuilder {
-
-    private static final String WORD_SEPARATOR_CHARACTER = " ";
 
     private PredicateBuilder() {
     }
@@ -24,7 +25,7 @@ public abstract class PredicateBuilder {
         BooleanBuilder predicate = new BooleanBuilder();
         QJourneyDetails qJourney = QJourneyDetails.journeyDetails;
 
-        if (sf.text != null && sf.textMatcher != null) {
+        if (!StringUtils.isEmpty(sf.text) && sf.textMatcher != null) {
             predicate.and(
                     matchTextFieldAgainstText(sf.textMatcher, qJourney.name, sf.text)
                             .or(matchTextFieldAgainstText(sf.textMatcher, qJourney.descript, sf.text))
@@ -33,10 +34,10 @@ public abstract class PredicateBuilder {
         if (sf.join != null && sf.joinMatcher != null) {
             predicate.and(matchFieldAgainstValue(sf.joinMatcher, qJourney.join, sf.join));
         }
-        if (sf.categories != null && sf.categoriesMatcher != null) {
+        if (!CollectionUtils.isEmpty(sf.categories) && sf.categoriesMatcher != null) {
             predicate.and(matchFieldAgainstValues(sf.categoriesMatcher, qJourney.categoryWeights.any().category, sf.categories));
         }
-        if (sf.topics != null && sf.topicsMatcher != null) {
+        if (!CollectionUtils.isEmpty(sf.topics) && sf.topicsMatcher != null) {
             predicate.and(matchCollectionFieldAgainstValues(sf.topicsMatcher, qJourney.topics, sf.topics));
         }
 
@@ -101,8 +102,8 @@ public abstract class PredicateBuilder {
     private static BooleanExpression matchTextFieldAgainstText(TextMatch matcher, StringExpression field, String textValue) {
         BooleanExpression[] exps = null;
         if (matcher == TextMatch.ANY_WORD_IGNORE_CASE || matcher == TextMatch.ALL_WORDS_IGNORE_CASE) {
-            textValue = textValue.replaceAll("\\s+", WORD_SEPARATOR_CHARACTER); // remove all double whitespaces
-            String[] textWords = textValue.split(WORD_SEPARATOR_CHARACTER);
+            textValue = textValue.replaceAll("\\s+", Constants.WORD_SEPARATOR_CHARACTER); // remove all double whitespaces
+            String[] textWords = textValue.split(Constants.WORD_SEPARATOR_CHARACTER);
             exps = new BooleanExpression[textWords.length];
             int count = 0;
             for (String word : textWords) {

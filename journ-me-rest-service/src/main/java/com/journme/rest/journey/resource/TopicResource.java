@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import java.util.List;
 
@@ -27,6 +28,13 @@ public class TopicResource extends AbstractResource {
     public List<Topic> retrieveRelevantTopics(@NotBlank @QueryParam("category") String category) {
         LOGGER.info("Incoming call to retrieve relevant topics for category {}", category);
         return categoryTopicService.getTopicByCategory(categoryTopicService.toValidCategory(category)).getContent();
+    }
+
+    @GET
+    @Path("/tag")
+    public List<Topic> getTopics(@NotBlank @QueryParam("tagFragment") String tagFragment) {
+        LOGGER.info("Incoming call to retrieve relevant topics for tagFragment {}", tagFragment);
+        return categoryTopicService.getTopicByTagFragment(tagFragment).getContent();
     }
 
 }
