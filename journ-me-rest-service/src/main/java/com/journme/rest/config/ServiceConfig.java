@@ -1,6 +1,7 @@
 package com.journme.rest.config;
 
 import com.journme.rest.alias.service.AliasService;
+import com.journme.rest.journey.service.CategoryTopicService;
 import com.journme.rest.journey.service.JourneyService;
 import com.journme.rest.moment.service.FeedbackService;
 import com.journme.rest.moment.service.MomentService;
@@ -33,5 +34,10 @@ public class ServiceConfig {
     @Bean
     public FeedbackService feedbackService() {
         return new FeedbackService();
+    }
+
+    @Bean
+    public CategoryTopicService categoryTopicService() {
+        return new CategoryTopicService();
     }
 }

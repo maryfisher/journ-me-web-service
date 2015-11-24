@@ -9,11 +9,11 @@ import java.util.Set;
 
 public abstract class Constants {
 
-    public static long TWO_WEEKS_MILLISEC = 2 * 14 * 24 * 60 * 60 * 1000L;
+    public static final long TWO_WEEKS_MILLISEC = 2 * 14 * 24 * 60 * 60 * 1000L;
 
-    public static int THUMBNAIL_SIZE = 80;
+    public static final int THUMBNAIL_SIZE = 80;
 
-    public static Set<MediaType> SUPPORTED_MEDIA_TYPE = Collections.unmodifiableSet(
+    public static final Set<MediaType> SUPPORTED_MEDIA_TYPE = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(
                     MediaType.IMAGE_JPEG,
                     MediaType.IMAGE_PNG,
@@ -21,12 +21,14 @@ public abstract class Constants {
             ))
     );
 
+    public static final String WORD_SEPARATOR_CHARACTER = " ";
+
     private Constants() {
     }
 
     public static abstract class Templates {
 
-        public static String JM_CONFIG_FILE = "templates/jm-config.tpl.js";
+        public static final String JM_CONFIG_FILE = "templates/jm-config.tpl.js";
 
         private Templates() {
         }

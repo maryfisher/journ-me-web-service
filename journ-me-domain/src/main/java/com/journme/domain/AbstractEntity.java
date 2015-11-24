@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.Date;
 
@@ -21,6 +22,7 @@ public abstract class AbstractEntity extends AbstractIdEntity {
     private Long version;
 
     @CreatedDate
+    @Indexed
     private Date created;
 
     @LastModifiedDate

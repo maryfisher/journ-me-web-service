@@ -13,11 +13,13 @@
         Category.class,
         Feedback.class,
         JourneyBase.class,
+        JourneyBase.CategoryWeight.class,
         JourneyDetails.class,
         MomentBase.class,
         MomentDetail.class,
         MomentImage.class,
         State.class,
+        Topic.class,
         User.class
 })
 package com.journme.rest.config;

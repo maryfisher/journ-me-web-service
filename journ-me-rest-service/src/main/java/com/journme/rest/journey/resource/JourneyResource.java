@@ -7,15 +7,22 @@ import com.journme.domain.JourneyDetails;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.common.searchfilter.JourneySearchFilter;
+import com.journme.rest.journey.service.CategoryTopicService;
 import com.journme.rest.journey.service.JourneyService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 
@@ -38,11 +45,31 @@ public class JourneyResource extends AbstractResource {
     @Autowired
     private AliasService aliasService;
 
+    @Autowired
+    private CategoryTopicService categoryTopicService;
+
+    @Path("/topic")
+    public Class<TopicResource> getTopicResource() {
+        return TopicResource.class;
+    }
+
     @GET
     @Path("/{journeyId}")
     public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
         LOGGER.info("Incoming request to retrieve journey {}", journeyId);
         return journeyService.getJourneyDetail(journeyId);
+    }
+
+    @POST
+    @Path("/search")
+    public Page<JourneyBase> searchJourneys(
+            @Min(0) @QueryParam("pageNumber") int pageNumber,
+            @Min(1) @Max(100) @QueryParam("pageSize") int pageSize,
+            @DefaultValue("DESC") @QueryParam("sortDirection") Sort.Direction sortDirection,
+            @DefaultValue("created") @QueryParam("sortProperty") String sortProperty,
+            @NotNull JourneySearchFilter searchFilter) {
+        LOGGER.info("Incoming journey search request of page size {} and page number {}", pageSize, pageNumber);
+        return journeyService.searchJourneys(new PageRequest(pageNumber, pageSize, sortDirection, sortProperty), searchFilter);
     }
 
     @POST
@@ -56,6 +83,10 @@ public class JourneyResource extends AbstractResource {
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
         journey.setAlias(aliasBase);
         journey.setId(null); //ensures that new Journey is created in the collection
+
+        journey.setCategoryWeights(categoryTopicService.toValidCategoryWeight(journey.getCategoryWeights()));
+        journey.setTopics(categoryTopicService.toValidTopic(journey.getTopics(), journey.getCategoryWeights()));
+
         journey = journeyService.save(journey);
 
         aliasDetail.getJourneys().add(journey);
@@ -74,8 +105,11 @@ public class JourneyResource extends AbstractResource {
 
         JourneyDetails existingJourney = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(existingJourney.getAlias().getId());
-        existingJourney.copy(changedJourney);
 
+        changedJourney.setCategoryWeights(categoryTopicService.toValidCategoryWeight(changedJourney.getCategoryWeights()));
+        changedJourney.setTopics(categoryTopicService.toValidTopic(changedJourney.getTopics(), changedJourney.getCategoryWeights()));
+
+        existingJourney.copy(changedJourney);
         existingJourney = journeyService.save(existingJourney);
         return changedJourney.copyAll(existingJourney);
     }

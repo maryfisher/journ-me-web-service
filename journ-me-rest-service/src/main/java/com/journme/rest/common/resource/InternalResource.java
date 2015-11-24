@@ -5,6 +5,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.journme.domain.Category;
 import com.journme.domain.State;
+import com.journme.domain.repository.CategoryRepository;
 import com.journme.domain.repository.StateRepository;
 import com.journme.rest.common.util.Constants;
 import com.journme.rest.config.JerseyConfig.ObjectMapperWrapper;
@@ -23,7 +24,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -36,6 +36,9 @@ public class InternalResource {
 
     @Autowired
     private StateRepository stateRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Autowired
     private ObjectMapperWrapper objectMapperWrapper;
@@ -51,18 +54,14 @@ public class InternalResource {
     @Path("/config/jm-config.js")
     @Produces("application/javascript")
     public String getConfig(@Context Providers providers) throws IOException {
+        LOGGER.info("Incoming call to retrieve client app configuration JS");
         ObjectMapper objectMapper = objectMapperWrapper.getObjectMapper();
 
+        // TODO: potential to cache the generated JS for a certain amount of time
         URL url = Resources.getResource(Constants.Templates.JM_CONFIG_FILE);
         String templateText = Resources.toString(url, Charsets.UTF_8);
 
-        Category category1 = new Category();
-        category1.setId("abc");
-        category1.setCode("SPORT");
-        category1.setName("Sport");
-        category1.setDescript("Sports related");
-        List<Category> categories = Arrays.asList(category1);
-
+        List<Category> categories = categoryRepository.findAll();
         List<State> states = stateRepository.findAll();
 
         String categoriesJson = objectMapper.writeValueAsString(categories);
