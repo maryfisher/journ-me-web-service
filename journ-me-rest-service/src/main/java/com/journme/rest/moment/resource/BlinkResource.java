@@ -4,15 +4,15 @@ import com.journme.domain.Blink;
 import com.journme.domain.BlinkImage;
 import com.journme.domain.MomentDetail;
 import com.journme.domain.MomentImage;
+import com.journme.domain.repository.BlinkImageRepository;
+import com.journme.domain.repository.BlinkRepository;
+import com.journme.domain.repository.MomentImageRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.util.Constants;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
-import com.journme.domain.repository.BlinkImageRepository;
-import com.journme.domain.repository.BlinkRepository;
-import com.journme.domain.repository.MomentImageRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -74,23 +74,26 @@ public class BlinkResource extends AbstractResource.AbstractImageResource {
         assertAliasInContext(moment.getAlias().getId());
 
         if (imageParts != null && !imageParts.isEmpty()) {
-            for (FormDataBodyPart imagePart : imageParts) {
-                String imageName = imagePart.getContentDisposition().getFileName();
-                MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
+            int mediaFileCount = Math.min(imageParts.size(), blink.getFormat().getMediaFileCount());
+            for (int i = 0; i < mediaFileCount; i++) {
+                FormDataBodyPart imagePart = imageParts.get(i);
+                MediaType mediaType = toSupportedMediaType(imagePart);
+                byte[] image = toByteArray(imagePart, mediaType);
 
-                byte[] image = toByteArray(imagePart);
+                if (image != null && image.length > 0) {
+                    String imageName = imagePart.getContentDisposition().getFileName();
+                    if (moment.getThumb() == null) {
+                        byte[] thumbnail = createResizedCopy(image, mediaType, Constants.THUMBNAIL_SIZE, Constants.THUMBNAIL_SIZE, true, true);
+                        MomentImage momentImage = new MomentImage(imageName, mediaType.toString(), null);
+                        momentImage.setThumbnail(thumbnail);
+                        momentImage = momentImageRepository.save(momentImage);
+                        moment.setThumb(momentImage);
+                    }
 
-                if (moment.getThumb() == null) {
-                    byte[] thumbnail = createResizedCopy(image, mediaType, Constants.THUMBNAIL_SIZE, Constants.THUMBNAIL_SIZE, true, true);
-                    MomentImage momentImage = new MomentImage(imageName, mediaType.toString(), null);
-                    momentImage.setThumbnail(thumbnail);
-                    momentImage = momentImageRepository.save(momentImage);
-                    moment.setThumb(momentImage);
+                    BlinkImage blinkImage = new BlinkImage(imageName, mediaType.toString(), image);
+                    blinkImage = blinkImageRepository.save(blinkImage);
+                    blink.getImages().add(blinkImage);
                 }
-
-                BlinkImage blinkImage = new BlinkImage(imageName, mediaType.toString(), image);
-                blinkImage = blinkImageRepository.save(blinkImage);
-                blink.getImages().add(blinkImage);
             }
         }
 
@@ -125,41 +128,43 @@ public class BlinkResource extends AbstractResource.AbstractImageResource {
         }
         assertAliasInContext(existingBlink.getMoment().getAlias().getId());
 
-        int indexCount = 0;
+        int changedMediaFileCount = 0;
+        int existingMediaFileCount = existingBlink.getImages().size();
         if (imageParts != null && !imageParts.isEmpty()) {
-            for (FormDataBodyPart imagePart : imageParts) {
-                if (imagePart != null) {
-                    String imageName = imagePart.getContentDisposition().getFileName();
-                    MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
-                    byte[] image = toByteArray(imagePart);
+            changedMediaFileCount = Math.min(imageParts.size(), changedBlink.getFormat().getMediaFileCount());
+            for (int k = 0; k < changedMediaFileCount; k++) {
+                FormDataBodyPart imagePart = imageParts.get(k);
+                MediaType mediaType = toSupportedMediaType(imagePart);
+                byte[] image = toByteArray(imagePart, mediaType);
 
-                    BlinkImage blinkImage = existingBlink.getImages().size() > indexCount ? existingBlink.getImages().get(indexCount) : null;
+                if (image != null && image.length > 0) {
+                    String imageName = imagePart.getContentDisposition().getFileName();
+                    BlinkImage blinkImage = k < existingBlink.getImages().size() ? existingBlink.getImages().get(k) : null;
                     if (blinkImage != null) {
                         // cannot reuse same image entity in DB for new image binary, because browser cached image according to ID
-                        blinkRepository.delete(blinkImage.getId());
+                        blinkImageRepository.delete(blinkImage.getId());
                     }
                     blinkImage = new BlinkImage(imageName, mediaType.toString(), image);
 
                     blinkImage = blinkImageRepository.save(blinkImage);
-                    if (indexCount >= existingBlink.getImages().size()) {
-                        existingBlink.getImages().add(blinkImage);
+                    if (k < existingBlink.getImages().size()) {
+                        existingBlink.getImages().set(k, blinkImage);
                     } else {
-                        existingBlink.getImages().set(indexCount, blinkImage);
+                        existingBlink.getImages().add(blinkImage);
                     }
                 }
-                indexCount++;
             }
         }
-        //If changing from 2 image format to 1 image format, must avoid keeping the orphaned image in the DB
-        if (existingBlink.getFormat() == Blink.BlinkFormat.DOUBLE_IMAGE && changedBlink.getFormat() != Blink.BlinkFormat.DOUBLE_IMAGE) {
+
+        // When changed blink has a format with fewer media/image files than existing blink, delete the "orphaned" media files
+        for (int j = existingMediaFileCount; j > changedMediaFileCount; j--) {
             List<BlinkImage> existingImages = existingBlink.getImages();
-            blinkImageRepository.delete(existingImages.get(1).getId());
-            existingImages.remove(1);
+            blinkImageRepository.delete(existingImages.get(j - 1).getId());
+            existingImages.remove(j - 1);
         }
 
         existingBlink.copy(changedBlink);
         return blinkRepository.save(existingBlink);
-
     }
 
     @GET

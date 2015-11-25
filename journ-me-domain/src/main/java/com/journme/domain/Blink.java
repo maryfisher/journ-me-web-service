@@ -129,12 +129,22 @@ public class Blink extends AbstractEntity {
     }
 
     public enum BlinkFormat {
-        RIGHT_IMAGE,
-        LEFT_IMAGE,
-        DOUBLE_TEXT,
-        SINGLE_TEXT,
-        VIDEO,
-        SINGLE_IMAGE,
-        DOUBLE_IMAGE
+        RIGHT_IMAGE(1),
+        LEFT_IMAGE(1),
+        DOUBLE_TEXT(0),
+        SINGLE_TEXT(0),
+        VIDEO(1),
+        SINGLE_IMAGE(1),
+        DOUBLE_IMAGE(2);
+
+        private final int mediaFileCount;
+
+        BlinkFormat(int mediaFileCount) {
+            this.mediaFileCount = mediaFileCount;
+        }
+
+        public int getMediaFileCount() {
+            return mediaFileCount;
+        }
     }
 }
