@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EntityToIdSerializer;
 import com.journme.domain.converter.NullConverter;
 import com.journme.domain.converter.StateListConverter;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -38,7 +37,6 @@ public class Feedback extends AbstractEntity {
     @JsonDeserialize(converter = NullConverter.class)
     private MomentBase moment;
 
-    @NotBlank
     private String body;
 
     @DBRef(lazy = true)
