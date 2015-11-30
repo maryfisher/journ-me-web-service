@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.Consumes;
@@ -78,9 +79,9 @@ public abstract class AbstractResource {
             }
         }
 
-        protected byte[] toByteArray(FormDataBodyPart imagePart) {
+        protected byte[] toByteArray(FormDataBodyPart imagePart, MediaType mediaType) {
             try {
-                return imagePart != null ? IOUtils.toByteArray(imagePart.getValueAs(InputStream.class)) : null;
+                return (mediaType != null && imagePart != null) ? IOUtils.toByteArray(imagePart.getValueAs(InputStream.class)) : null;
             } catch (IOException ex) {
                 throw new JournMeException("Exception during reading of image byte data",
                         Response.Status.BAD_REQUEST,
@@ -128,15 +129,23 @@ public abstract class AbstractResource {
             }
         }
 
-        protected MediaType toSupportedMediaType(String mediaTypeStr) {
+        protected MediaType toSupportedMediaType(FormDataBodyPart imagePart) {
+            if (imagePart == null || StringUtils.isEmpty(imagePart.getMediaType())) {
+                return null;
+            }
+            String mediaTypeStr = imagePart.getMediaType().toString();
             try {
                 MediaType mediaType = MediaType.parseMediaType(mediaTypeStr);
-                if (!Constants.SUPPORTED_MEDIA_TYPE.contains(mediaType)) {
+                if (Constants.SUPPORTED_MEDIA_TYPE.contains(mediaType)) {
+                    return mediaType;
+                } else if (MediaType.TEXT_PLAIN.equals(mediaType)) {
+                    // "null" was send in by ng-file-upload for unchanged/invalid file
+                    return null;
+                } else {
                     throw new JournMeException("Not among supported media types " + mediaTypeStr,
                             Response.Status.BAD_REQUEST,
                             ExceptionCode.FILE_TYPE_CORRUPTED_INVALID);
                 }
-                return mediaType;
             } catch (InvalidMediaTypeException ex) {
                 throw new JournMeException("Cannot parse media type string " + mediaTypeStr,
                         Response.Status.BAD_REQUEST,

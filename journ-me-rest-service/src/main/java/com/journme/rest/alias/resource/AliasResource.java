@@ -63,10 +63,10 @@ public class AliasResource extends AbstractResource.AbstractImageResource {
         AliasBase changedAlias = aliasPart.getValueAs(AliasBase.class);
 
         AliasDetail existingAlias = aliasService.getAliasDetail(aliasId);
-        byte[] image = toByteArray(imagePart);
+        MediaType mediaType = toSupportedMediaType(imagePart);
+        byte[] image = toByteArray(imagePart, mediaType);
         if (image != null && image.length > 0) {
             String imageName = imagePart.getContentDisposition().getFileName();
-            MediaType mediaType = toSupportedMediaType(imagePart.getMediaType().toString());
 
             AliasImage aliasImage = existingAlias.getImage();
             if (aliasImage != null) {
