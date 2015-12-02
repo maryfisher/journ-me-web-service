@@ -17,7 +17,7 @@ import java.util.Date;
  */
 public interface FeedbackRepository extends MongoRepository<Feedback, String>, QueryDslPredicateExecutor<Feedback> {
 
-    @Query("{'momentAlias.$id': ?0, 'alias.$id': {'$ne': ?0}, 'created': {'$gt': ?1}}")
+    @Query("{'momentAlias.$id': ?0, 'alias.$id': {'$ne': ?0}, 'created': {'$gt': ?1}, 'body': {'$exists': true}}")
     Page<Feedback> findRecent(ObjectId aliasId, Date date, Pageable page);
 
 }
