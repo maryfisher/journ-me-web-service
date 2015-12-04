@@ -16,7 +16,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
 
-public class PasswordHashingServiceImpl implements IPasswordHashingService {
+public class PasswordHashingServiceImpl implements PasswordHashingService {
 
     public static final String HASH_ALGORITHM = "PBKDF2WithHmacSHA512";
 

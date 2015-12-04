@@ -8,7 +8,7 @@ package com.journme.rest.config;
 
 import com.journme.rest.common.security.AuthTokenService;
 import com.journme.rest.common.security.AuthTokenServiceImpl;
-import com.journme.rest.common.security.IPasswordHashingService;
+import com.journme.rest.common.security.PasswordHashingService;
 import com.journme.rest.common.security.PasswordHashingServiceImpl;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -50,7 +50,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public IPasswordHashingService passwordHashingService() {
+    public PasswordHashingService passwordHashingService() {
         return new PasswordHashingServiceImpl();
     }
 }

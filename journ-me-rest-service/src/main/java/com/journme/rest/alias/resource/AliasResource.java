@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 
 /**
  * @author mary_fisher
@@ -55,7 +54,7 @@ public class AliasResource extends AbstractResource.AbstractImageResource {
     public AliasBase updateAlias(
             @NotBlank @PathParam("aliasId") String aliasId,
             @FormDataParam("file") FormDataBodyPart imagePart,
-            @FormDataParam("alias") FormDataBodyPart aliasPart) throws IOException {
+            @FormDataParam("alias") FormDataBodyPart aliasPart) {
         LOGGER.info("Incoming request to update alias {}", aliasId);
         AliasBase aliasBaseInContext = assertAliasInContext(aliasId);
 

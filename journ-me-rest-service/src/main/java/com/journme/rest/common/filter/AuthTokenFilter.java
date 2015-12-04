@@ -16,7 +16,6 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
 import java.security.Principal;
 
 /**
@@ -38,7 +37,7 @@ public class AuthTokenFilter implements ContainerRequestFilter {
     private AuthTokenService authTokenService;
 
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext) {
         String authToken = requestContext.getHeaders().getFirst(LoginResponse.AUTH_TOKEN_HEADER_KEY);
 
         User user = authTokenService.unwrapAuthToken(authToken);

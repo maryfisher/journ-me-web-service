@@ -58,8 +58,8 @@ public class InternalResource {
         ObjectMapper objectMapper = objectMapperWrapper.getObjectMapper();
 
         // TODO: potential to cache the generated JS for a certain amount of time
-        URL url = Resources.getResource(Constants.Templates.JM_CONFIG_FILE);
-        String templateText = Resources.toString(url, Charsets.UTF_8);
+        URL fileLocation = Resources.getResource(Constants.Templates.JM_CONFIG_FILE);
+        String templateText = Resources.toString(fileLocation, Charsets.UTF_8);
 
         List<Category> categories = categoryRepository.findAll();
         List<State> states = stateRepository.findAll();

@@ -1,9 +1,12 @@
 package com.journme.rest.config;
 
-import com.sendgrid.SendGrid;
+import com.journme.rest.user.service.EmailService;
+import com.journme.rest.user.service.EmailServiceImpl;
+import com.journme.rest.user.service.EmailServiceMock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 @Configuration
 public class EmailConfig {
@@ -15,8 +18,11 @@ public class EmailConfig {
     private String sendGridPassword;
 
     @Bean
-    public SendGrid sendGrid() {
-        return new SendGrid(sendGridUsername, sendGridPassword);
+    public EmailService emailService() {
+        if (StringUtils.isEmpty(sendGridUsername) || StringUtils.isEmpty(sendGridPassword)) {
+            return new EmailServiceMock();
+        } else {
+            return new EmailServiceImpl(sendGridUsername, sendGridPassword);
+        }
     }
-
 }
