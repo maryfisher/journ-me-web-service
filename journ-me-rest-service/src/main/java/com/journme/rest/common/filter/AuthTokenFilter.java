@@ -8,6 +8,7 @@ import com.journme.rest.contract.user.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -39,6 +40,10 @@ public class AuthTokenFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) {
         String authToken = requestContext.getHeaders().getFirst(LoginResponse.AUTH_TOKEN_HEADER_KEY);
+        if (StringUtils.isEmpty(authToken)) {
+            // Fallback: if authToken not in header, look within query parameters
+            authToken = requestContext.getUriInfo().getQueryParameters().getFirst(LoginResponse.AUTH_TOKEN_HEADER_KEY);
+        }
 
         User user = authTokenService.unwrapAuthToken(authToken);
         if (user != null) {

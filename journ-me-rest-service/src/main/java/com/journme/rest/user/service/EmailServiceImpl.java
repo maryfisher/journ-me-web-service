@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.net.URI;
@@ -34,14 +35,17 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Async
     public void sendForgotPasswordEmail(UriInfo requestUri, User user) throws IOException {
+        UriBuilder passwordForgotUri = requestUri.getBaseUriBuilder()
+                .replacePath("")
+                .fragment("reset-forgotten-password");
+        // Angular needs ? query params to appear after the fragment #, hence concatenate accordingly
+        String passwordForgotUrlStr = passwordForgotUri.build().toString();
+        passwordForgotUri.replaceQueryParam(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
+        passwordForgotUrlStr = passwordForgotUrlStr.concat("?").concat(passwordForgotUri.build().getQuery());
+
         URL emailTemplateLocation = Resources.getResource(Constants.Templates.PASSWORD_FORGOT_EMAIL);
         String emailText = Resources.toString(emailTemplateLocation, Charsets.UTF_8);
-        URI passwordForgotUrl = requestUri.getBaseUriBuilder()
-                .replacePath("")
-                .fragment("forgot-password")
-                .queryParam(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user))
-                .build();
-        emailText = emailText.replace("${passwordForgotUrl}", passwordForgotUrl.toString());
+        emailText = emailText.replace("${passwordForgotUrl}", passwordForgotUrlStr);
 
         SendGrid.Email sendGridEmail = new SendGrid.Email();
         sendGridEmail.addTo(user.getEmail());

@@ -138,9 +138,9 @@ public class UserResource extends AbstractResource {
     }
 
     @POST
-    @Path("/authentication/reset-password")
+    @Path("/authentication/reset-forgotten-password")
     @ProtectedByAuthToken
-    public void resetPassword(@NotBlank String newPassword) {
+    public void resetForgottenPassword(@NotBlank String newPassword) {
         User user = returnUserFromContext();
         LOGGER.info("Incoming request to reset password for user {}", user.getEmail());
 
