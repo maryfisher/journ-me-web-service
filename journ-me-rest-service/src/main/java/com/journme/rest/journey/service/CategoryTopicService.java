@@ -27,7 +27,7 @@ public class CategoryTopicService {
     @Autowired
     private TopicRepository topicRepository;
 
-    private Set<String> categoriesCache;
+    private volatile Set<String> categoriesCache;
 
     public Page<Topic> getTopicByCategory(String category) {
         return topicRepository.findAll(new PageRequest(0, 100, Direction.DESC,
@@ -86,8 +86,7 @@ public class CategoryTopicService {
         return inputTopics;
     }
 
-    private Set<String> getSupportedCategories() {
-        // TODO: potential to cache the list of categories for a certain amount of time (since Admins won't change categories that often)
+    public Set<String> getSupportedCategories() {
         if (categoriesCache == null) {
             List<Category> categoryList = categoryRepository.findAll();
             List<String> categoryStrList = new ArrayList<>(categoryList.size());
@@ -96,6 +95,10 @@ public class CategoryTopicService {
             categoriesCache = Collections.unmodifiableSet(new HashSet<>(categoryStrList));
         }
         return categoriesCache;
+    }
+
+    public void clearCategoriesCache() {
+        categoriesCache = null;
     }
 
 }

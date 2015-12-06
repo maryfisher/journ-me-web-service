@@ -27,14 +27,20 @@ public abstract class Constants {
     }
 
     public static abstract class Templates {
-
         public static final String JM_CONFIG_FILE = "templates/jm-config.tpl.js";
-
         public static final String PASSWORD_FORGOT_EMAIL = "templates/password-forgot.tpl.html";
 
         private Templates() {
         }
 
+    }
+
+    public static abstract class ServerSentEvent {
+        public static final String RECENT_NOTIFICATIONS = "RECENT_NOTIFICATIONS";
+        public static final String JOURNEY_CREATED = "JOURNEY_CREATED";
+
+        private ServerSentEvent() {
+        }
     }
 
 }

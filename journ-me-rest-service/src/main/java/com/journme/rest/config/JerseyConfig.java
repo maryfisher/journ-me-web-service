@@ -13,6 +13,7 @@ import com.journme.rest.common.errorhandling.JerseyExceptionMapper;
 import com.journme.rest.common.filter.AuthTokenFilter;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -56,6 +57,7 @@ public class JerseyConfig extends ResourceConfig {
         register(MultiPartFeature.class);
 
         //Jackson features
+        register(SseFeature.class);
         register(JacksonFeature.class);
         register(JerseyObjectMapperProvider.class);
 

@@ -40,7 +40,7 @@ public class EmailServiceImpl implements EmailService {
         // Angular needs ? query params to appear after the fragment #, hence concatenate accordingly
         String passwordForgotUrlStr = passwordForgotUri.build().toString();
         passwordForgotUri.replaceQueryParam(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(user));
-        passwordForgotUrlStr = passwordForgotUrlStr.concat("?").concat(passwordForgotUri.build().getQuery());
+        passwordForgotUrlStr = passwordForgotUrlStr + "?" + passwordForgotUri.build().getQuery();
 
         URL emailTemplateLocation = Resources.getResource(Constants.Templates.PASSWORD_FORGOT_EMAIL);
         String emailText = Resources.toString(emailTemplateLocation, Charsets.UTF_8);

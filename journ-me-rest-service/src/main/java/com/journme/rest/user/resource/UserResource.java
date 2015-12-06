@@ -58,6 +58,11 @@ public class UserResource extends AbstractResource {
     @Autowired
     private EmailService emailService;
 
+    @Path("/notifications")
+    public Class<NotificationResource> getNotificationResource() {
+        return NotificationResource.class;
+    }
+
     @POST
     @Path("/authentication/login")
     public LoginResponse login(@NotNull @Valid LoginRequest loginRequest) {
@@ -109,6 +114,10 @@ public class UserResource extends AbstractResource {
         populatePasswordData(newUser, registerRequest.getPassword());
 
         newUser = userRepository.save(newUser);
+
+        // circular dependency on MongoDB IDs
+        newUserFirstAlias.setUserId(newUser.getId());
+        newUserFirstAlias = aliasBaseRepository.save(newUserFirstAlias);
 
         LoginResponse loginResponse = new LoginResponse(newUser);
         loginResponse.put(LoginResponse.AUTH_TOKEN_HEADER_KEY, authTokenService.createAuthToken(newUser));

@@ -18,6 +18,7 @@
         MomentBase.class,
         MomentDetail.class,
         MomentImage.class,
+        Notification.class,
         State.class,
         Topic.class,
         User.class

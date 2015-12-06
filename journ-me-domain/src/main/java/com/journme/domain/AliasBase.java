@@ -1,5 +1,6 @@
 package com.journme.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.journme.domain.converter.EntityToIdSerializer;
@@ -24,6 +25,9 @@ public class AliasBase extends AbstractEntity {
     @JsonDeserialize(converter = NullConverter.class)
     private AliasImage image;
 
+    @JsonIgnore
+    private String userId;
+
     public String getName() {
         return name;
     }
@@ -40,12 +44,23 @@ public class AliasBase extends AbstractEntity {
         this.image = image;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public AliasBase copy(AliasBase other) {
         if (other.name != null) {
             this.name = other.name;
         }
         if (other.image != null) {
             this.image = other.image;
+        }
+        if (other.userId != null) {
+            this.userId = other.userId;
         }
         return this;
     }
