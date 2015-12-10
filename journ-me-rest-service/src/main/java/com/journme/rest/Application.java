@@ -4,6 +4,7 @@ package com.journme.rest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * <h1>Spring Boot Application main configuration</h1>
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
  * @since 15.10.2015
  */
 @SpringBootApplication
+@EnableAsync
 public class Application {
 
     public static void main(String[] args) {

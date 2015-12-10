@@ -6,7 +6,7 @@
  */
 package com.journme.rest.common.security;
 
-public interface IPasswordHashingService {
+public interface PasswordHashingService {
 
     int RECOMMENDED_ITERATIONS = 1000;
 

@@ -30,6 +30,8 @@ public abstract class Constants {
 
         public static final String JM_CONFIG_FILE = "templates/jm-config.tpl.js";
 
+        public static final String PASSWORD_FORGOT_EMAIL = "templates/password-forgot.tpl.html";
+
         private Templates() {
         }
 
