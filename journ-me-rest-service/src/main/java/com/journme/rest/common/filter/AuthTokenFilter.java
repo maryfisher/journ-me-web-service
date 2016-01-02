@@ -14,6 +14,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.Provider;
@@ -51,7 +52,7 @@ public class AuthTokenFilter implements ContainerRequestFilter {
         } else {
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).
                     entity(new JournMeExceptionDto(ExceptionCode.AUTH_TOKEN_INVALID)).
-                    type("application/json").
+                    type(MediaType.APPLICATION_JSON_TYPE).
                     build());
         }
     }
