@@ -6,6 +6,8 @@ import javax.ws.rs.core.Response;
 
 public class JournMeException extends RuntimeException {
 
+    private static final long serialVersionUID = 7039984300770628781L;
+
     private final ExceptionCode code;
 
     private final Response.Status httpStatus;

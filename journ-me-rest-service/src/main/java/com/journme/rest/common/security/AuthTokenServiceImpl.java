@@ -23,7 +23,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.ws.rs.core.Response;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
@@ -45,7 +44,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
     public AuthTokenServiceImpl(
             GenericObjectPoolConfig poolConfig,
             long authTokenExpirationPeriod,
-            String secretKeyBase64) throws NoSuchAlgorithmException, InvalidKeyException {
+            String secretKeyBase64) throws InvalidKeyException {
         LOGGER.info("Instantiating cipherPool with configuration: maxTotal={}, maxIdle={}, minIdle={}, maxWait={}",
                 poolConfig.getMaxTotal(), poolConfig.getMaxIdle(), poolConfig.getMinIdle(), poolConfig.getMaxWaitMillis());
         this.cipherPool = new GenericObjectPool<>(new AesCbcCipherFactory(), poolConfig);
@@ -61,7 +60,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
     public String createAuthToken(User user) {
         LOGGER.info("Creating auth token for user {}", user.getId());
         String messageToEncrypt = new Date().getTime() +
-                SEPARATOR_CHARACTER  + user.getId() +
+                SEPARATOR_CHARACTER + user.getId() +
                 SEPARATOR_CHARACTER + user.getPasswordHash();
         byte[] encryptedAuthToken = encryptMessage(messageToEncrypt, this.secretKeyForAuthToken);
         return Base64.encodeBase64URLSafeString(encryptedAuthToken);

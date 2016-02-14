@@ -74,7 +74,7 @@ public class JourneyService {
             criteria.and(qCreated.before(to));
         }
 
-        return journeyBaseRepository.findAll(criteria, new PageRequest(0, 20, Direction.DESC, qCreated.getMetadata().getName()));
+        return journeyBaseRepository.findAll(criteria, new PageRequest(0, 10, Direction.DESC, qCreated.getMetadata().getName()));
     }
 
     public Page<JourneyBase> searchJourneys(PageRequest pageRequest, JourneySearchFilter searchFilter) {

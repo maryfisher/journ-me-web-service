@@ -7,7 +7,6 @@ import com.journme.rest.moment.service.MomentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +38,6 @@ public class StatsResource {
     @Autowired
     private JourneyService journeyService;
 
-    @Autowired
-    private MongoTemplate template;
-
     @GET
     public StatsResponse retrieveStats() {
         LOGGER.info("Incoming request to retrieve stats");
@@ -50,6 +46,7 @@ public class StatsResource {
         response.setAllMoments(momentService.countAll());
         response.setAllFeedbacks(feedbackRepository.count());
 
+        //TODO: move these to JourneyResource/MomentResource as GET endpoints supporting pagination, sorting & search filter
         long twoWeeks = 2 * 14 * 24 * 60 * 60 * 1000L;
         Date date = new Date(new Date().getTime() - twoWeeks);
         response.setRecentMoments(momentService.getMomentsByDate(date, null).getContent());

@@ -1,6 +1,5 @@
 package com.journme.rest.alias.resource;
 
-import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.util.Constants;
@@ -30,9 +29,7 @@ public class DashboardResource extends AbstractResource {
     @Autowired
     private FeedbackService feedbackService;
 
-    @Autowired
-    private AliasService aliasService;
-
+    //TODO: move this to FeedbackResource as GET endpoint supporting pagination, sorting & search filter
     @POST
     @ProtectedByAuthToken
     public DashboardResponse retrieveRecentFeedback(DashboardRequest request) {

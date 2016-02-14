@@ -16,7 +16,6 @@ import org.springframework.scheduling.annotation.Async;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 
 public class EmailServiceImpl implements EmailService {
@@ -26,7 +25,7 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private AuthTokenService authTokenService;
 
-    private SendGrid sendGrid;
+    private final SendGrid sendGrid;
 
     public EmailServiceImpl(String sendGridUsername, String sendGridPassword) {
         sendGrid = new SendGrid(sendGridUsername, sendGridPassword);

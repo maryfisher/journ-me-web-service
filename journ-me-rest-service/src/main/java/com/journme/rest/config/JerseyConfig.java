@@ -90,7 +90,7 @@ public class JerseyConfig extends ResourceConfig {
     }
 
     public static class ObjectMapperWrapper {
-        private ObjectMapper objectMapper;
+        private final ObjectMapper objectMapper;
 
         public ObjectMapperWrapper(ObjectMapper om, ApplicationContext ac) {
             om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

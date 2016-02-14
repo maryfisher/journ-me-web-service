@@ -47,6 +47,7 @@ public class InternalResource {
     @Path("/monitoring/healthchecks")
     public String getHealthcheck() {
         LOGGER.debug("Incoming healthcheck call");
+        //TODO: healthcheck to return software version (PROD) or commit hash (DEV)
         return "{\"status\":\"OK\",\"message\":\"OK!\"}";
     }
 
