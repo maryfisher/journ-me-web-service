@@ -24,4 +24,9 @@ public class SSEChannel extends EventOutput {
         return this == other || other instanceof SSEChannel && this.channelId.equals(((SSEChannel) other).channelId);
 
     }
+
+    @Override
+    public int hashCode() {
+        return this.channelId.hashCode();
+    }
 }

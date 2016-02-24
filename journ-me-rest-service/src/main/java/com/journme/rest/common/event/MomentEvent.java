@@ -1,5 +1,6 @@
 package com.journme.rest.common.event;
 
+import com.journme.domain.AliasBase;
 import com.journme.domain.MomentBase;
 
 /**
@@ -7,13 +8,17 @@ import com.journme.domain.MomentBase;
  * <p>
  * Created by PHT on 21.02.2016.
  */
-public class MomentEvent extends AbstractEntityEvent {
+public class MomentEvent extends AbstractEntityEvent<MomentBase> implements PersonalEvent<AliasBase> {
 
-    private MomentBase moment;
+    private final AliasBase alias;
 
-    public MomentEvent(Type type, String userId, MomentBase moment) {
-        super(type, userId);
-        this.moment = moment;
+    public MomentEvent(Type type, MomentBase moment, AliasBase alias) {
+        super(type, moment);
+        this.alias = alias;
     }
 
+    @Override
+    public AliasBase getAffectedPerson() {
+        return alias;
+    }
 }

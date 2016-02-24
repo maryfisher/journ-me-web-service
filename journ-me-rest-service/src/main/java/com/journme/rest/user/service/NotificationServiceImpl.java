@@ -1,64 +1,73 @@
 package com.journme.rest.user.service;
 
 import com.google.common.eventbus.Subscribe;
-import com.journme.rest.common.event.Event;
 import com.journme.rest.common.event.MomentEvent;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NotificationServiceImpl implements NotificationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
-    private Map<String, Set<SSEChannel>> channels = new ConcurrentHashMap<>();
+    private Map<String, Map<String, SSEChannel>> channels = new ConcurrentHashMap<>();
 
-    public boolean registerSSEChannel(String userId, SSEChannel sseChannel) {
-        if (!channels.containsKey(userId)) {
-            channels.put(userId, ConcurrentHashMap.newKeySet());
+    public SSEChannel registerSSEChannel(String userId, String authToken) {
+        Map<String, SSEChannel> userChannels = channels.get(userId);
+        if (userChannels == null) {
+            userChannels = new ConcurrentHashMap<>();
+            channels.put(userId, userChannels);
         }
-        return channels.get(userId).add(sseChannel);
+        SSEChannel userChannel = userChannels.get(authToken);
+        if (userChannel == null) {
+            userChannel = new SSEChannel(authToken);
+            userChannels.put(authToken, userChannel);
+        }
+        return userChannel;
     }
 
     @Subscribe
     public void on(MomentEvent e) {
-        LOGGER.info("Handling MomentEvent {}", e.getUserId());
+        String userId = e.getAffectedPerson().getUserId();
+        LOGGER.info("Handling event of moment {} for user {}", e.getPayLoad().getId(), userId);
 
-        Set<SSEChannel> userChannels = channels.get(e.getUserId());
+        Map<String, SSEChannel> userChannels = channels.get(userId);
         if (userChannels == null) {
-            LOGGER.info("No user channels open dor user {}", e.getUserId());
+            LOGGER.info("No SSE channels open for user {}", userId);
             return;
         }
 
-        Iterator<SSEChannel> it = userChannels.iterator();
+        Iterator<Map.Entry<String, SSEChannel>> it = userChannels.entrySet().iterator();
         while (it.hasNext()) {
-            SSEChannel channel = it.next();
-            LOGGER.info("Sending SSE stream via to channel {}", channel.getChannelId());
+            SSEChannel channel = it.next().getValue();
+            LOGGER.info("Sending SSE stream to user {} via channel {}", userId, channel.getChannelId());
             try {
-                final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder();
-                eventBuilder.name(e.getType().toString());
-                eventBuilder.data(String.class, e.getUserId());
+                final OutboundEvent.Builder eventBuilder = new OutboundEvent.Builder()
+                        .mediaType(MediaType.APPLICATION_JSON_TYPE)
+                        .name(e.getClass().getSimpleName() + ":" + e.getType())
+                        .data(String.class, e.getPayLoad());
                 channel.write(eventBuilder.build());
             } catch (IOException e1) {
-                LOGGER.info("Channel {} is dead", channel.getChannelId());
-                it.remove();
+                LOGGER.info("Exception thrown in channel " + channel.getChannelId(), e1);
+                try {
+                    channel.close();
+                } catch (IOException e2) {
+                    LOGGER.warn("Cannot close channel " + channel.getChannelId(), e2);
+                } finally {
+                    it.remove();
+                }
             }
         }
 
         if (userChannels.isEmpty()) {
-            channels.remove(e.getUserId());
+            channels.remove(userId);
         }
     }
 
-
-    @Subscribe
-    public void on(Event e) {
-        LOGGER.info("Handling Event");
-    }
 }

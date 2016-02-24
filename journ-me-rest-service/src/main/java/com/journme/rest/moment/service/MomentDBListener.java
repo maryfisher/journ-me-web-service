@@ -15,9 +15,9 @@ import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventLis
 import org.springframework.stereotype.Component;
 
 @Component
-public class MomentEventListener extends AbstractMongoEventListener<MomentBase> {
+public class MomentDBListener extends AbstractMongoEventListener<MomentBase> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MomentEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MomentDBListener.class);
 
     private static final Long ZERO = 0L;
 
@@ -40,7 +40,7 @@ public class MomentEventListener extends AbstractMongoEventListener<MomentBase> 
             }
 
             for (AliasBase followerAlias : journey.getFollowers()) {
-                eventBus.post(new MomentEvent(Type.NEW, followerAlias.getUserId(), moment));
+                eventBus.post(new MomentEvent(Type.INSERT, moment, followerAlias));
             }
         }
     }

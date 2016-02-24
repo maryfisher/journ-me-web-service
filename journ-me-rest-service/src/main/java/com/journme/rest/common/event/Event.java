@@ -1,8 +1,11 @@
 package com.journme.rest.common.event;
 
 /**
- * I am a tagging interface
+ * Tagging interface for events
  * Created by PHT on 21.02.2016.
  */
-public interface Event {
+public interface Event<T> {
+
+    T getPayLoad();
+
 }

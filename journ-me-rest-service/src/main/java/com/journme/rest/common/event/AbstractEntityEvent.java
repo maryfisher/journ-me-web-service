@@ -1,40 +1,35 @@
 package com.journme.rest.common.event;
 
+import com.journme.domain.AbstractEntity;
+
 /**
  * Base class for all DB events
  * <p>
  * Created by PHT on 21.02.2016.
  */
-public abstract class AbstractEntityEvent implements Event {
+public abstract class AbstractEntityEvent<T extends AbstractEntity> implements Event {
 
     public enum Type {
-        NEW,
-        CHANGED,
-        REMOVED
+        INSERT,
+        UPDATE,
+        DELETE
     }
 
-    public AbstractEntityEvent(Type type, String userId) {
+    private final Type type;
+
+    private final T entity;
+
+    public AbstractEntityEvent(Type type, T entity) {
         this.type = type;
-        this.userId = userId;
+        this.entity = entity;
     }
 
-    private Type type;
-
-    private String userId;
+    @Override
+    public T getPayLoad() {
+        return entity;
+    }
 
     public Type getType() {
         return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 }
