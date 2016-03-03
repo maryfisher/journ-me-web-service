@@ -3,10 +3,11 @@ package com.journme.rest.moment.service;
 import com.journme.domain.MomentBase;
 import com.journme.domain.MomentDetail;
 import com.journme.domain.QMomentDetail;
-import com.journme.rest.common.errorhandling.JournMeException;
-import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.domain.repository.MomentBaseRepository;
 import com.journme.domain.repository.MomentDetailRepository;
+import com.journme.rest.common.errorhandling.JournMeException;
+import com.journme.rest.common.searchfilter.MomentSearchFilter;
+import com.journme.rest.contract.JournMeExceptionDto;
 import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.path.DateTimePath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,13 @@ public class MomentService {
         }
 
         return momentDetailRepository.findAll(criteria, new PageRequest(0, 10, Direction.DESC, qCreated.getMetadata().getName()));
+    }
+
+    public Page<MomentBase> searchMoments(PageRequest pageRequest, MomentSearchFilter searchFilter) {
+        QMomentDetail qMoment = QMomentDetail.momentDetail;
+        BooleanExpression predicate = qMoment.isPublic.isTrue();
+        //predicate = predicate.and(PredicateBuilder.fromSearchFilter(searchFilter));
+        return momentBaseRepository.findAll(predicate, pageRequest);
     }
 
     private void throwExc(String momentId) {

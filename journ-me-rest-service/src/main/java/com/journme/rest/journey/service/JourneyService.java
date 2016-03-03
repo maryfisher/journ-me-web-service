@@ -81,7 +81,9 @@ public class JourneyService {
         // Can use QJourneyDetails predicates, even if querying against journeyBaseRepository
         QJourneyDetails qJourney = QJourneyDetails.journeyDetails;
         BooleanExpression predicate = qJourney.isPublic.isTrue();
-        predicate = predicate.and(PredicateBuilder.fromSearchFilter(searchFilter));
+        if (searchFilter != null) {
+            predicate = predicate.and(PredicateBuilder.fromSearchFilter(searchFilter));
+        }
         return journeyBaseRepository.findAll(predicate, pageRequest);
     }
 

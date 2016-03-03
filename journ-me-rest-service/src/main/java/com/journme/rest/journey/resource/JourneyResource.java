@@ -67,7 +67,7 @@ public class JourneyResource extends AbstractResource {
             @Min(1) @Max(100) @QueryParam("pageSize") int pageSize,
             @DefaultValue("DESC") @QueryParam("sortDirection") Sort.Direction sortDirection,
             @DefaultValue("created") @QueryParam("sortProperty") String sortProperty,
-            @NotNull JourneySearchFilter searchFilter) {
+            JourneySearchFilter searchFilter) {
         LOGGER.info("Incoming journey search request of page size {} and page number {}", pageSize, pageNumber);
         return journeyService.searchJourneys(new PageRequest(pageNumber, pageSize, sortDirection, sortProperty), searchFilter);
     }

@@ -1,22 +1,28 @@
 package com.journme.rest.moment.resource;
 
 import com.journme.domain.*;
+import com.journme.domain.repository.MomentImageRepository;
 import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
+import com.journme.rest.common.searchfilter.MomentSearchFilter;
 import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.journey.service.JourneyService;
-import com.journme.domain.repository.MomentImageRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -46,6 +52,18 @@ public class MomentResource extends AbstractResource.AbstractImageResource {
     public MomentDetail retrieveMoment(@NotBlank @PathParam("momentId") String momentId) {
         LOGGER.info("Incoming request to retrieve moment {}", momentId);
         return momentService.getMomentDetail(momentId);
+    }
+
+    @POST
+    @Path("/search")
+    public Page<MomentBase> searchMoments(
+            @Min(0) @QueryParam("pageNumber") int pageNumber,
+            @Min(1) @Max(100) @QueryParam("pageSize") int pageSize,
+            @DefaultValue("DESC") @QueryParam("sortDirection") Sort.Direction sortDirection,
+            @DefaultValue("created") @QueryParam("sortProperty") String sortProperty,
+            MomentSearchFilter searchFilter) {
+        LOGGER.info("Incoming journey search request of page size {} and page number {}", pageSize, pageNumber);
+        return momentService.searchMoments(new PageRequest(pageNumber, pageSize, sortDirection, sortProperty), searchFilter);
     }
 
     @POST

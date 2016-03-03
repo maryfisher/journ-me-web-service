@@ -1,10 +1,5 @@
 package com.journme.rest.contract.stats;
 
-import com.journme.domain.JourneyBase;
-import com.journme.domain.MomentDetail;
-
-import java.util.List;
-
 /**
  * @author mary_fisher
  * @version 1.0
@@ -17,9 +12,6 @@ public class StatsResponse {
     private Long allJoins;
     private Long allFollowers;
     private Long allFeedbacks;
-
-    private List<MomentDetail> recentMoments;
-    private List<JourneyBase> recentJourneys;
 
     public Long getAllJourneys() {
         return allJourneys;
@@ -67,21 +59,5 @@ public class StatsResponse {
 
     public void setAllFeedbacks(Long allFeedbacks) {
         this.allFeedbacks = allFeedbacks;
-    }
-
-    public List<MomentDetail> getRecentMoments() {
-        return recentMoments;
-    }
-
-    public void setRecentMoments(List<MomentDetail> recentMoments) {
-        this.recentMoments = recentMoments;
-    }
-
-    public List<JourneyBase> getRecentJourneys() {
-        return recentJourneys;
-    }
-
-    public void setRecentJourneys(List<JourneyBase> recentJourneys) {
-        this.recentJourneys = recentJourneys;
     }
 }
