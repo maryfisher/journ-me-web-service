@@ -1,8 +1,8 @@
 package com.journme.rest.home;
 
+import com.journme.domain.repository.FeedbackRepository;
 import com.journme.rest.contract.stats.StatsResponse;
 import com.journme.rest.journey.service.JourneyService;
-import com.journme.domain.repository.FeedbackRepository;
 import com.journme.rest.moment.service.MomentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,6 @@ import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
-import java.util.Date;
 
 /**
  * @author mary_fisher
@@ -45,12 +44,6 @@ public class StatsResource {
         response.setAllJourneys(journeyService.countAll());
         response.setAllMoments(momentService.countAll());
         response.setAllFeedbacks(feedbackRepository.count());
-
-        //TODO: move these to JourneyResource/MomentResource as GET endpoints supporting pagination, sorting & search filter
-        long twoWeeks = 2 * 14 * 24 * 60 * 60 * 1000L;
-        Date date = new Date(new Date().getTime() - twoWeeks);
-        response.setRecentMoments(momentService.getMomentsByDate(date, null).getContent());
-        response.setRecentJourneys(journeyService.getJourneysByDate(date, null).getContent());
 
         return response;
     }
