@@ -21,6 +21,9 @@ public class AliasDetail extends AliasBase {
     @DBRef
     private List<JourneyBase> joinedJourneys = new ArrayList<>();
 
+    @DBRef
+    private List<Notebook> notebooks = new ArrayList<>();
+
     public List<JourneyBase> getJoinedJourneys() {
         return joinedJourneys;
     }
@@ -43,5 +46,13 @@ public class AliasDetail extends AliasBase {
 
     public void setFollowedJourneys(List<JourneyBase> followedJourneys) {
         this.followedJourneys = followedJourneys;
+    }
+
+    public List<Notebook> getNotebooks() {
+        return notebooks;
+    }
+
+    public void setNotebooks(List<Notebook> notebooks) {
+        this.notebooks = notebooks;
     }
 }

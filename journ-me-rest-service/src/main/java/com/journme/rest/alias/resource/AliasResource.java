@@ -3,11 +3,11 @@ package com.journme.rest.alias.resource;
 import com.journme.domain.AliasBase;
 import com.journme.domain.AliasDetail;
 import com.journme.domain.AliasImage;
+import com.journme.domain.repository.AliasImageRepository;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.util.Constants;
-import com.journme.rest.contract.ImageClassifier;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.hibernate.validator.constraints.NotBlank;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Singleton;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
 
 /**
  * @author mary_fisher
@@ -34,6 +33,14 @@ public class AliasResource extends AbstractResource.AbstractImageResource {
 
     @Autowired
     private AliasService aliasService;
+
+    private AliasImageRepository aliasImageRepository;
+
+    @Autowired
+    public AliasResource(AliasImageRepository aliasImageRepository) {
+        super(aliasImageRepository);
+        this.aliasImageRepository = aliasImageRepository;
+    }
 
     @Path("/dashboard")
     public Class<DashboardResource> getStatResource() {
@@ -83,21 +90,5 @@ public class AliasResource extends AbstractResource.AbstractImageResource {
         existingAlias.copy(changedAlias);
         existingAlias = aliasService.save(existingAlias);
         return aliasBaseInContext.copyAll(existingAlias);
-    }
-
-    @GET
-    @Path("/image/{aliasImageId}/{imageClassifier:\\w*}")
-    public Response retrieveImageWithClassifier(
-            @NotBlank @PathParam("aliasImageId") String aliasImageId,
-            @DefaultValue("original") @PathParam("imageClassifier") ImageClassifier imageClassifier) {
-        LOGGER.info("Incoming request to retrieve {} alias image {}", imageClassifier, aliasImageId);
-        AliasImage image = aliasService.getImage(aliasImageId);
-        return sendImageResponse(image, imageClassifier);
-    }
-
-    @GET
-    @Path("/image/{aliasImageId}")
-    public Response retrieveImage(@NotBlank @PathParam("aliasImageId") String aliasImageId) {
-        return retrieveImageWithClassifier(aliasImageId, ImageClassifier.original);
     }
 }

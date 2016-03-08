@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0
  * @since 24.10.2015
  */
-public class JourneyDetails extends JourneyBase {
+public class JourneyDetail extends JourneyBase {
 
     @DBRef(lazy = true)
     private List<MomentBase> moments = new ArrayList<>();
@@ -32,6 +32,9 @@ public class JourneyDetails extends JourneyBase {
 
     @DBRef(lazy = true)
     private List<AliasBase> joinRequests = new ArrayList<>();
+
+    @DBRef
+    private List<Notebook> notebooks = new ArrayList<>();
 
     public List<MomentBase> getMoments() {
         return moments;
@@ -79,5 +82,13 @@ public class JourneyDetails extends JourneyBase {
 
     public void setJoinRequests(List<AliasBase> joinRequests) {
         this.joinRequests = joinRequests;
+    }
+
+    public List<Notebook> getNotebooks() {
+        return notebooks;
+    }
+
+    public void setNotebooks(List<Notebook> notebooks) {
+        this.notebooks = notebooks;
     }
 }

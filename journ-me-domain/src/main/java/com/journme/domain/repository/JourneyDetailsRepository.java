@@ -1,6 +1,6 @@
 package com.journme.domain.repository;
 
-import com.journme.domain.JourneyDetails;
+import com.journme.domain.JourneyDetail;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
@@ -12,5 +12,5 @@ import org.springframework.data.querydsl.QueryDslPredicateExecutor;
  * @version 1.0
  * @since 20.10.2015
  */
-public interface JourneyDetailsRepository extends MongoRepository<JourneyDetails, String>, QueryDslPredicateExecutor<JourneyDetails> {
+public interface JourneyDetailsRepository extends MongoRepository<JourneyDetail, String>, QueryDslPredicateExecutor<JourneyDetail> {
 }

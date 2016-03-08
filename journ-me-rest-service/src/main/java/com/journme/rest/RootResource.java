@@ -7,6 +7,8 @@ import com.journme.rest.journey.resource.JourneyResource;
 import com.journme.rest.moment.resource.BlinkResource;
 import com.journme.rest.moment.resource.FeedbackResource;
 import com.journme.rest.moment.resource.MomentResource;
+import com.journme.rest.note.resource.NoteResource;
+import com.journme.rest.note.resource.NotebookResource;
 import com.journme.rest.user.resource.UserResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +71,16 @@ public class RootResource {
     @Path("/blink")
     public Class<BlinkResource> getBlinkResource() {
         return BlinkResource.class;
+    }
+
+    @Path("/notebook")
+    public Class<NotebookResource> getNotebookResource() {
+        return NotebookResource.class;
+    }
+
+    @Path("/note")
+    public Class<NoteResource> getNoteResource() {
+        return NoteResource.class;
     }
 
     @Path("/stats")

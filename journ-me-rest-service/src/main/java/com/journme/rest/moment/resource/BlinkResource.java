@@ -11,7 +11,6 @@ import com.journme.rest.common.errorhandling.JournMeException;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
 import com.journme.rest.common.util.Constants;
-import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto;
 import com.journme.rest.moment.service.MomentService;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -43,13 +42,18 @@ public class BlinkResource extends AbstractResource.AbstractImageResource {
     private MomentService momentService;
 
     @Autowired
-    private BlinkRepository blinkRepository;
+    private MomentImageRepository momentImageRepository;
 
     @Autowired
+    private BlinkRepository blinkRepository;
+
     private BlinkImageRepository blinkImageRepository;
 
     @Autowired
-    private MomentImageRepository momentImageRepository;
+    public BlinkResource(BlinkImageRepository blinkImageRepository) {
+        super(blinkImageRepository);
+        this.blinkImageRepository = blinkImageRepository;
+    }
 
     @GET
     @Path("/{blinkId}/")
@@ -165,21 +169,5 @@ public class BlinkResource extends AbstractResource.AbstractImageResource {
 
         existingBlink.copy(changedBlink);
         return blinkRepository.save(existingBlink);
-    }
-
-    @GET
-    @Path("/image/{blinkImageId}/{imageClassifier:\\w*}")
-    public Response retrieveImageWithClassifier(
-            @NotBlank @PathParam("blinkImageId") String blinkImageId,
-            @DefaultValue("original") @PathParam("imageClassifier") ImageClassifier imageClassifier) {
-        LOGGER.info("Incoming request to retrieve {} blink image {}", imageClassifier, blinkImageId);
-        BlinkImage image = blinkImageRepository.findOne(blinkImageId);
-        return sendImageResponse(image, imageClassifier);
-    }
-
-    @GET
-    @Path("/image/{blinkImageId}")
-    public Response retrieveImage(@NotBlank @PathParam("blinkImageId") String blinkImageId) {
-        return retrieveImageWithClassifier(blinkImageId, ImageClassifier.original);
     }
 }

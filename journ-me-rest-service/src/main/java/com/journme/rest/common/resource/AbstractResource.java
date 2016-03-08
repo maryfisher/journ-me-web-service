@@ -10,13 +10,16 @@ import com.journme.rest.contract.ImageClassifier;
 import com.journme.rest.contract.JournMeExceptionDto.ExceptionCode;
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -62,7 +65,31 @@ public abstract class AbstractResource {
                 ExceptionCode.ALIAS_NONEXISTENT);
     }
 
-    public static abstract class AbstractImageResource extends AbstractResource {
+    public static abstract class AbstractImageResource<T extends AbstractEntity.AbstractImageEntity> extends AbstractResource {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(AbstractImageResource.class);
+
+        private MongoRepository<T, String> imageRepository;
+
+        public AbstractImageResource(MongoRepository<T, String> imageRepository) {
+            this.imageRepository = imageRepository;
+        }
+
+        @GET
+        @Path("/image/{imageId}/{imageClassifier:\\w*}")
+        public Response retrieveImageWithClassifier(
+                @NotBlank @PathParam("imageId") String imageId,
+                @DefaultValue("original") @PathParam("imageClassifier") ImageClassifier imageClassifier) {
+            LOGGER.info("Incoming request to retrieve {} blink image {}", imageClassifier, imageId);
+            AbstractEntity.AbstractImageEntity image = imageRepository.findOne(imageId);
+            return sendImageResponse(image, imageClassifier);
+        }
+
+        @GET
+        @Path("/image/{imageId}")
+        public Response retrieveImage(@NotBlank @PathParam("imageId") String imageId) {
+            return retrieveImageWithClassifier(imageId, ImageClassifier.original);
+        }
 
         protected Response sendImageResponse(AbstractEntity.AbstractImageEntity image, ImageClassifier imageClassifier) {
             if (image != null) {

@@ -3,7 +3,7 @@ package com.journme.rest.journey.resource;
 import com.journme.domain.AliasBase;
 import com.journme.domain.AliasDetail;
 import com.journme.domain.JourneyBase;
-import com.journme.domain.JourneyDetails;
+import com.journme.domain.JourneyDetail;
 import com.journme.rest.alias.service.AliasService;
 import com.journme.rest.common.filter.ProtectedByAuthToken;
 import com.journme.rest.common.resource.AbstractResource;
@@ -55,7 +55,7 @@ public class JourneyResource extends AbstractResource {
 
     @GET
     @Path("/{journeyId}")
-    public JourneyDetails retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
+    public JourneyDetail retrieveJourney(@NotBlank @PathParam("journeyId") String journeyId) {
         LOGGER.info("Incoming request to retrieve journey {}", journeyId);
         return journeyService.getJourneyDetail(journeyId);
     }
@@ -103,7 +103,7 @@ public class JourneyResource extends AbstractResource {
             @NotNull @Valid JourneyBase changedJourney) {
         LOGGER.info("Incoming request to update journey {}", journeyId);
 
-        JourneyDetails existingJourney = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail existingJourney = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(existingJourney.getAlias().getId());
 
         changedJourney.setCategoryWeights(categoryTopicService.toValidCategoryWeight(changedJourney.getCategoryWeights()));
@@ -124,7 +124,7 @@ public class JourneyResource extends AbstractResource {
 
         AliasBase aliasBase = assertAliasInContext(aliasId);
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
 
         journey.getFollowers().add(aliasBase);
         journey = journeyService.save(journey);
@@ -143,7 +143,7 @@ public class JourneyResource extends AbstractResource {
 
         AliasBase aliasBase = assertAliasInContext(aliasId);
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
 
         journey.getFollowers().remove(aliasBase);
         journey = journeyService.save(journey);
@@ -160,8 +160,8 @@ public class JourneyResource extends AbstractResource {
             @NotBlank @PathParam("linkedJourneyId") String linkedJourneyId) {
         LOGGER.info("Incoming request to link journey {} from journey {}", journeyId, linkedJourneyId);
 
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
-        JourneyDetails linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
 
         assertAliasInContext(linkedJourney.getAlias().getId());
 
@@ -174,13 +174,13 @@ public class JourneyResource extends AbstractResource {
     @POST
     @Path("/{journeyId}/unlink/{linkedJourneyId}")
     @ProtectedByAuthToken
-    public JourneyDetails unlinkJourney(
+    public JourneyDetail unlinkJourney(
             @NotBlank @PathParam("journeyId") String journeyId,
             @NotBlank @PathParam("linkedJourneyId") String linkedJourneyId) {
         LOGGER.info("Incoming request to unlink journey {} from journey {}", journeyId, linkedJourneyId);
 
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
-        JourneyDetails linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail linkedJourney = journeyService.getJourneyDetail(linkedJourneyId);
 
         assertAliasInContext(linkedJourney.getAlias().getId());
 
@@ -201,7 +201,7 @@ public class JourneyResource extends AbstractResource {
         LOGGER.info("Incoming request to request joining journey {} with alias {}", journeyId, aliasId);
 
         AliasBase aliasBase = assertAliasInContext(aliasId);
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
 
         journey.getJoinRequests().add(aliasBase);
         journeyService.save(journey);
@@ -215,7 +215,7 @@ public class JourneyResource extends AbstractResource {
             @NotBlank @PathParam("aliasId") String aliasId) {
         LOGGER.info("Incoming request to accept joining journey {} with alias {}", journeyId, aliasId);
 
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(journey.getAlias().getId());
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
 
@@ -235,7 +235,7 @@ public class JourneyResource extends AbstractResource {
             @NotBlank @PathParam("aliasId") String aliasId) {
         LOGGER.info("Incoming request to unjoin journey {} with alias {}", journeyId, aliasId);
 
-        JourneyDetails journey = journeyService.getJourneyDetail(journeyId);
+        JourneyDetail journey = journeyService.getJourneyDetail(journeyId);
         assertAliasInContext(aliasId, journey.getAlias().getId());
         AliasDetail aliasDetail = aliasService.getAliasDetail(aliasId);
 
